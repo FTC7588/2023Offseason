@@ -1,17 +1,23 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.qualcomm.robotcore.hardware.PwmControl;
+
 import org.firstinspires.ftc.teamcode.util.pid.PoofyPIDCoefficients;
 
 public class Constants {
 
-    public static double ELE_KP = 0.005;
-    public static double ELE_KI = 0.0002;
-    public static double ELE_KD = 0.0004;
-    public static double ELE_KF = 0.175;
-
+    //elevator
     public static PoofyPIDCoefficients ELE_COEFFS= new PoofyPIDCoefficients(0.005, 0.0002, 0.0004, 0, 0, 0, 0.175);
 
     public static double ELE_MAX_VEL = 200;
     public static double ELE_MAX_ACCEL = 50;
+
+
+    //rotator
+    public static PwmControl.PwmRange TUNED_RANGE = new PwmControl.PwmRange(590, 2400);
+
+
+    //intake
+    public static int INTAKE_AVG_SIZE = 75;
 
 }

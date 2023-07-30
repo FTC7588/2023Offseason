@@ -28,13 +28,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         controller = new PoofyProfiledPIDController(ELE_COEFFS, constraints);
     }
 
-    public void loop() {
-        elePower = controller.calculate(elePos);
-    }
 
     public void read() {
         elePos = (robot.eleL.getCurrentPosition() + robot.eleR.getCurrentPosition()) / 2.0;
         eleCurrent = (robot.eleL.getCurrent(CurrentUnit.AMPS) + robot.eleR.getCurrent(CurrentUnit.AMPS)) / 2.0;
+    }
+
+    public void loop() {
+        elePower = controller.calculate(elePos);
     }
 
     public void write() {
@@ -48,6 +49,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
+    //getters
     public double getElePos() {
         return ticksToInches(elePos);
     }
@@ -69,6 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
+    //conversion
     private double inchesToTicks(double inches) {
         return inches * 79.0426072601;
     }
