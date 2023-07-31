@@ -1,15 +1,16 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCCommand;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCResponse;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
@@ -32,7 +33,7 @@ public class RobotHardware {
 
     public CRServo intake;
 
-    public BNO055IMU imu;
+    public IMU imu;
 
     private List<LynxModule> hubs;
 
@@ -63,6 +64,24 @@ public class RobotHardware {
         }
 
 
+        //drive
+        fL = hwMap.get(DcMotorEx.class, "fL");
+        fR = hwMap.get(DcMotorEx.class, "fR");
+        rL = hwMap.get(DcMotorEx.class, "rL");
+        rR = hwMap.get(DcMotorEx.class, "rR");
+
+        fL.setDirection(DcMotorSimple.Direction.REVERSE);
+        rL.setDirection(DcMotorSimple.Direction.REVERSE);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
         //elevator
         eleL = hwMap.get(DcMotorEx.class, "eleL");
         eleR = hwMap.get(DcMotorEx.class, "eleR");
@@ -89,19 +108,27 @@ public class RobotHardware {
 
         intake.setInverted(true);
 
-    }
+        imu = hwMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.FORWARD, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+        imu.initialize(parameters);
 
-    public void loop(Subsystems subsystems) {
-        subsystems.getEle().loop();
     }
 
     public void read(Subsystems subsystems) {
         //calculateControlServoBusCurrent();
         //calculateExpansionServoBusCurrent();
+        subsystems.getDrive().read();
         subsystems.getEle().read();
     }
 
+    public void loop(Subsystems subsystems) {
+        subsystems.getDrive().loop();
+        subsystems.getEle().loop();
+    }
+
     public void write(Subsystems subsystems) {
+        subsystems.getDrive().write();
         subsystems.getEle().write();
     }
 

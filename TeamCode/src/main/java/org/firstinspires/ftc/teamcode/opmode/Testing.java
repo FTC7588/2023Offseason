@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RollingAverage;
 
 import org.firstinspires.ftc.teamcode.commandbase.commands.MoveElevatorToPosition;
+import org.firstinspires.ftc.teamcode.commandbase.commands.RobotCentricPID;
+import org.firstinspires.ftc.teamcode.commandbase.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
@@ -18,10 +20,13 @@ public class Testing extends CommandOpMode {
 
     private GamepadEx driver;
 
+    private DrivetrainSubsystem driveSS;
     private ElevatorSubsystem elevatorSS;
 
     private Subsystems subsystems;
 
+
+    private RobotCentricPID robotCentricPID;
 
     private MoveElevatorToPosition eleUp;
     private MoveElevatorToPosition eleDown;
@@ -37,9 +42,18 @@ public class Testing extends CommandOpMode {
 
         driver = new GamepadEx(gamepad1);
 
+        driveSS = new DrivetrainSubsystem(robot);
         elevatorSS = new ElevatorSubsystem(robot);
 
-        subsystems = new Subsystems(elevatorSS);
+        subsystems = new Subsystems(driveSS, elevatorSS);
+
+
+        robotCentricPID = new RobotCentricPID(
+                driveSS,
+                () -> driver.getLeftX(),
+                () -> driver.getLeftY(),
+                () -> driver.getRightX()
+        );
 
         eleUp = new MoveElevatorToPosition(elevatorSS, 8);
         eleDown = new MoveElevatorToPosition(elevatorSS, 4);
@@ -53,6 +67,8 @@ public class Testing extends CommandOpMode {
 
 
         loopAvg = new RollingAverage(50);
+
+        robotCentricPID.schedule();
 
         telemetry.addLine("ready:");
         telemetry.update();
