@@ -112,6 +112,7 @@ public class PoofyPIDController extends PoofyFeedForwardController {
         this.targetAcceleration = targetAcceleration;
     }
 
+    //continuous
     public void setInputBounds(double min, double max) {
         if (min < max) {
             inputBounded = true;
@@ -217,6 +218,10 @@ public class PoofyPIDController extends PoofyFeedForwardController {
 
     public double getPeriod() {
         return period;
+    }
+
+    public boolean isInputBounded() {
+        return inputBounded;
     }
 
     public void reset() {

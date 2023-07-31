@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.PwmControl;
 
 import org.firstinspires.ftc.teamcode.util.pid.PoofyPIDCoefficients;
 
+@Config
 public class Constants {
 
     //elevator
-    public static PoofyPIDCoefficients ELE_COEFFS= new PoofyPIDCoefficients(0.005, 0.0002, 0.0004, 0, 0, 0, 0.175);
+    public static PoofyPIDCoefficients ELE_COEFFS= new PoofyPIDCoefficients(0.005, 0.000, 0.0004, 0, 0, 0, 0);
 
     public static double ELE_MAX_VEL = 200;
-    public static double ELE_MAX_ACCEL = 50;
+    public static double ELE_MAX_ACCEL = 100;
 
 
     //rotator

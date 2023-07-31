@@ -97,7 +97,7 @@ public class RobotHardware {
 
     public void read(Subsystems subsystems) {
         //calculateControlServoBusCurrent();
-        calculateExpansionServoBusCurrent();
+        //calculateExpansionServoBusCurrent();
         subsystems.getEle().read();
     }
 

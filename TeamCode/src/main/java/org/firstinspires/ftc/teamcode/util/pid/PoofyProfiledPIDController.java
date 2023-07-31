@@ -1,38 +1,39 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package org.firstinspires.ftc.teamcode.util.pid;
 
-import org.firstinspires.ftc.teamcode.util.MotionProfile;
+import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.util.TrapezoidProfile;
 
-@SuppressWarnings("PMD.TooManyMethods")
 public class PoofyProfiledPIDController {
     private PoofyPIDController m_controller;
-    private MotionProfile.State m_goal = new MotionProfile.State();
-    private MotionProfile.State m_setpoint = new MotionProfile.State();
-    private MotionProfile.Constraints m_constraints;
+    private double m_minimumInput;
+    private double m_maximumInput;
+    private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+    private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+    private TrapezoidProfile.Constraints m_constraints;
 
     /**
-     * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
-     * Kd.
+     * Allocates a FixedProfiledPIDController with the given constants for Kp, Ki, and Kd.
      *
-     * @param Kp          The proportional coefficient.
-     * @param Ki          The integral coefficient.
-     * @param Kd          The derivative coefficient.
+     * @param Kp The proportional coefficient.
+     * @param Ki The integral coefficient.
+     * @param Kd The derivative coefficient.
      * @param constraints Velocity and acceleration constraints for goal.
      */
-    @SuppressWarnings("ParameterName")
-    public PoofyProfiledPIDController(double Kp, double Ki, double Kd,
-                                      MotionProfile.Constraints constraints) {
-        m_controller = new PoofyPIDController.Builder().addPID(Kp, Ki, Kd).build();
-        m_constraints = constraints;
-    }
-
-    public PoofyProfiledPIDController(PoofyPIDCoefficients coeffs,
-                                      MotionProfile.Constraints constraints) {
+    public PoofyProfiledPIDController(
+            PoofyPIDCoefficients coeffs, TrapezoidProfile.Constraints constraints) {
         m_controller = new PoofyPIDController(coeffs);
         m_constraints = constraints;
     }
 
     /**
-     * Sets the PIDFController gain parameters.
+     * Sets the PID Controller gain parameters.
      *
      * <p>Sets the proportional, integral, and differential coefficients.
      *
@@ -40,37 +41,33 @@ public class PoofyProfiledPIDController {
      * @param Ki Integral coefficient
      * @param Kd Differential coefficient
      */
-    @SuppressWarnings("ParameterName")
     public void setPID(double Kp, double Ki, double Kd) {
         m_controller.setPID(Kp, Ki, Kd);
     }
 
     /**
-     * Sets the proportional coefficient of the PIDF controller gain.
+     * Sets the proportional coefficient of the PID controller gain.
      *
      * @param Kp proportional coefficient
      */
-    @SuppressWarnings("ParameterName")
     public void setP(double Kp) {
         m_controller.setP(Kp);
     }
 
     /**
-     * Sets the integral coefficient of the PIDF controller gain.
+     * Sets the integral coefficient of the PID controller gain.
      *
      * @param Ki integral coefficient
      */
-    @SuppressWarnings("ParameterName")
     public void setI(double Ki) {
         m_controller.setI(Ki);
     }
 
     /**
-     * Sets the differential coefficient of the PIDF controller gain.
+     * Sets the differential coefficient of the PID controller gain.
      *
      * @param Kd differential coefficient
      */
-    @SuppressWarnings("ParameterName")
     public void setD(double Kd) {
         m_controller.setD(Kd);
     }
@@ -112,27 +109,29 @@ public class PoofyProfiledPIDController {
     }
 
     /**
-     * Sets the goal for the ProfiledPIDController.
+     * Sets the goal for the FixedProfiledPIDController.
      *
      * @param goal The desired goal state.
      */
-    public void setGoal(MotionProfile.State goal) {
+    public void setGoal(TrapezoidProfile.State goal) {
         m_goal = goal;
     }
 
     /**
-     * Sets the goal for the ProfiledPIDController.
+     * Sets the goal for the FixedProfiledPIDController.
      *
      * @param goal The desired goal position.
      */
     public void setGoal(double goal) {
-        m_goal = new MotionProfile.State(goal, 0, 0);
+        m_goal = new TrapezoidProfile.State(goal, 0);
     }
 
     /**
-     * Gets the goal for the ProfiledPIDController.
+     * Gets the goal for the FixedProfiledPIDController.
+     *
+     * @return The goal.
      */
-    public MotionProfile.State getGoal() {
+    public TrapezoidProfile.State getGoal() {
         return m_goal;
     }
 
@@ -140,6 +139,8 @@ public class PoofyProfiledPIDController {
      * Returns true if the error is within the tolerance of the error.
      *
      * <p>This will return false until at least one input value has been computed.
+     *
+     * @return True if the error is within the tolerance of the error.
      */
     public boolean atGoal() {
         return atSetpoint() && m_goal.equals(m_setpoint);
@@ -150,16 +151,16 @@ public class PoofyProfiledPIDController {
      *
      * @param constraints Velocity and acceleration constraints for goal.
      */
-    public void setConstraints(MotionProfile.Constraints constraints) {
+    public void setConstraints(TrapezoidProfile.Constraints constraints) {
         m_constraints = constraints;
     }
 
     /**
-     * Returns the current setpoint of the ProfiledPIDController.
+     * Returns the current setpoint of the FixedProfiledPIDController.
      *
      * @return The current setpoint.
      */
-    public MotionProfile.State getSetpoint() {
+    public TrapezoidProfile.State getSetpoint() {
         return m_setpoint;
     }
 
@@ -167,9 +168,39 @@ public class PoofyProfiledPIDController {
      * Returns true if the error is within the tolerance of the error.
      *
      * <p>This will return false until at least one input value has been computed.
+     *
+     * @return True if the error is within the tolerance of the error.
      */
     public boolean atSetpoint() {
         return m_controller.atSetPoint();
+    }
+
+    /**
+     * Enables continuous input.
+     *
+     * <p>Rather then using the max and min input range as constraints, it considers them to be the
+     * same point and automatically calculates the shortest route to the setpoint.
+     *
+     * @param minimumInput The minimum value expected from the input.
+     * @param maximumInput The maximum value expected from the input.
+     */
+    public void setInputBounds(double minimumInput, double maximumInput) {
+        m_controller.setInputBounds(minimumInput, maximumInput);
+        m_minimumInput = minimumInput;
+        m_maximumInput = maximumInput;
+    }
+
+    /**
+     * Sets the minimum and maximum values for the integrator.
+     *
+     * <p>When the cap is reached, the integrator value is added to the controller output rather than
+     * the integrator value times the integral gain.
+     *
+     * @param minimumIntegral The minimum value of the integrator.
+     * @param maximumIntegral The maximum value of the integrator.
+     */
+    public void setIntegratorRange(double minimumIntegral, double maximumIntegral) {
+        m_controller.setIntegrationBounds(minimumIntegral, maximumIntegral);
     }
 
     /**
@@ -202,29 +233,49 @@ public class PoofyProfiledPIDController {
 
     /**
      * Returns the change in error per second.
+     *
+     * @return The change in error per second.
      */
     public double getVelocityError() {
         return m_controller.getVelocityError();
     }
 
     /**
-     * Returns the next output of the PIDFcontroller.
+     * Returns the next output of the PID controller.
      *
      * @param measurement The current measurement of the process variable.
+     * @return The controller's next output.
      */
     public double calculate(double measurement) {
-        MotionProfile profile = new MotionProfile(m_setpoint, m_goal, m_constraints);
+        if (m_controller.isInputBounded()) {
+            // Get error which is the smallest distance between goal and measurement
+            double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
+            double goalMinDistance =
+                    MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);
+            double setPointMinDistance =
+                    MathUtil.inputModulus(m_setpoint.position - measurement, -errorBound, errorBound);
+
+            // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
+            // may be outside the input range after this operation, but that's OK because the controller
+            // will still go there and report an error of zero. In other words, the setpoint only needs to
+            // be offset from the measurement by the input range modulus; they don't need to be equal.
+            m_goal.position = goalMinDistance + measurement;
+            m_setpoint.position = setPointMinDistance + measurement;
+        }
+
+        TrapezoidProfile profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(getPeriod());
-        return m_controller.calculate(measurement, m_setpoint.x);
+        return m_controller.calculate(measurement, m_setpoint.position);
     }
 
     /**
-     * Returns the next output of the PIDFcontroller.
+     * Returns the next output of the PID controller.
      *
      * @param measurement The current measurement of the process variable.
-     * @param goal        The new goal of the controller.
+     * @param goal The new goal of the controller.
+     * @return The controller's next output.
      */
-    public double calculate(double measurement, MotionProfile.State goal) {
+    public double calculate(double measurement, TrapezoidProfile.State goal) {
         setGoal(goal);
         return calculate(measurement);
     }
@@ -233,7 +284,8 @@ public class PoofyProfiledPIDController {
      * Returns the next output of the PIDController.
      *
      * @param measurement The current measurement of the process variable.
-     * @param goal        The new goal of the controller.
+     * @param goal The new goal of the controller.
+     * @return The controller's next output.
      */
     public double calculate(double measurement, double goal) {
         setGoal(goal);
@@ -241,23 +293,17 @@ public class PoofyProfiledPIDController {
     }
 
     /**
-     * Returns the next output of the PIDFcontroller.
+     * Returns the next output of the PID controller.
      *
      * @param measurement The current measurement of the process variable.
-     * @param goal        The new goal of the controller.
+     * @param goal The new goal of the controller.
      * @param constraints Velocity and acceleration constraints for goal.
+     * @return The controller's next output.
      */
-    public double calculate(double measurement, MotionProfile.State goal,
-                            MotionProfile.Constraints constraints) {
+    public double calculate(
+            double measurement, TrapezoidProfile.State goal, TrapezoidProfile.Constraints constraints) {
         setConstraints(constraints);
         return calculate(measurement, goal);
-    }
-
-    /**
-     * Reset the previous error, the integral term, and disable the controller.
-     */
-    public void reset() {
-        m_controller.reset();
     }
 
     /**
@@ -265,7 +311,7 @@ public class PoofyProfiledPIDController {
      *
      * @param measurement The current measured State of the system.
      */
-    public void reset(MotionProfile.State measurement) {
+    public void reset(TrapezoidProfile.State measurement) {
         m_controller.reset();
         m_setpoint = measurement;
     }
@@ -277,14 +323,14 @@ public class PoofyProfiledPIDController {
      * @param measuredVelocity The current measured velocity of the system.
      */
     public void reset(double measuredPosition, double measuredVelocity) {
-        reset(new MotionProfile.State(measuredPosition, measuredVelocity));
+        reset(new TrapezoidProfile.State(measuredPosition, measuredVelocity));
     }
 
     /**
      * Reset the previous error and the integral term.
      *
-     * @param measuredPosition The current measured position of the system. The velocity is
-     *                         assumed to be zero.
+     * @param measuredPosition The current measured position of the system. The velocity is assumed to
+     *     be zero.
      */
     public void reset(double measuredPosition) {
         reset(measuredPosition, 0.0);
