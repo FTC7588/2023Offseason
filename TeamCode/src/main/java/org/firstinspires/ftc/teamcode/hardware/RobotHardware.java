@@ -120,16 +120,19 @@ public class RobotHardware {
         //calculateExpansionServoBusCurrent();
         subsystems.getDrive().read();
         subsystems.getEle().read();
+        subsystems.getIntake().read();
     }
 
     public void loop(Subsystems subsystems) {
         subsystems.getDrive().loop();
         subsystems.getEle().loop();
+        subsystems.getIntake().loop();
     }
 
     public void write(Subsystems subsystems) {
         subsystems.getDrive().write();
         subsystems.getEle().write();
+        subsystems.getIntake().write();
     }
 
     public void clearBulkCache() {

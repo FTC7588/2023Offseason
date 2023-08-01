@@ -12,7 +12,7 @@ public class Constants {
     public static PoofyPIDCoefficients DRIVE_X_COEFFS = new PoofyPIDCoefficients(0, 0, 0, 0, 0, 0, 0);
     public static PoofyPIDCoefficients DRIVE_Y_COEFFS = new PoofyPIDCoefficients(0, 0, 0, 0, 0, 0, 0);
     public static PoofyPIDCoefficients DRIVE_THETA_COEFFS = new PoofyPIDCoefficients(1, 0, 0, 0, 0, 0, 0);
-    public static double DRIVE_MAX_TURN_SPEED_PID = 5;
+    public static double DRIVE_MAX_TURN_SPEED_PID = 8;
 
 
     //elevator

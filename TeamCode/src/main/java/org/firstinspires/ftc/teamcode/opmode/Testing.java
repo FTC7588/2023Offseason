@@ -8,10 +8,15 @@ import com.qualcomm.robotcore.util.RollingAverage;
 
 import org.firstinspires.ftc.teamcode.commandbase.commands.MoveElevatorToPosition;
 import org.firstinspires.ftc.teamcode.commandbase.commands.RobotCentricPID;
+import org.firstinspires.ftc.teamcode.commandbase.commands.SetHeadingTarget;
+import org.firstinspires.ftc.teamcode.commandbase.commands.SetIntakePower;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.ElevatorSubsystem;
+import org.firstinspires.ftc.teamcode.commandbase.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+
+import java.util.Set;
 
 @TeleOp
 public class Testing extends CommandOpMode {
@@ -22,14 +27,24 @@ public class Testing extends CommandOpMode {
 
     private DrivetrainSubsystem driveSS;
     private ElevatorSubsystem elevatorSS;
+    private IntakeSubsystem intakeSS;
 
     private Subsystems subsystems;
 
 
     private RobotCentricPID robotCentricPID;
 
+    private SetHeadingTarget north;
+    private SetHeadingTarget east;
+    private SetHeadingTarget south;
+    private SetHeadingTarget west;
+
     private MoveElevatorToPosition eleUp;
     private MoveElevatorToPosition eleDown;
+
+    private SetIntakePower intakeIn;
+    private SetIntakePower intakeIdle;
+    private SetIntakePower intakeOut;
 
 
     protected double loopTime;
@@ -44,8 +59,9 @@ public class Testing extends CommandOpMode {
 
         driveSS = new DrivetrainSubsystem(robot);
         elevatorSS = new ElevatorSubsystem(robot);
+        intakeSS = new IntakeSubsystem(robot);
 
-        subsystems = new Subsystems(driveSS, elevatorSS);
+        subsystems = new Subsystems(driveSS, elevatorSS, intakeSS);
 
 
         robotCentricPID = new RobotCentricPID(
@@ -55,8 +71,17 @@ public class Testing extends CommandOpMode {
                 () -> driver.getRightX()
         );
 
+        north = new SetHeadingTarget(driveSS, Math.toRadians(0));
+        east = new SetHeadingTarget(driveSS, Math.toRadians(90));
+        south = new SetHeadingTarget(driveSS, Math.toRadians(180));
+        west = new SetHeadingTarget(driveSS, Math.toRadians(-90));
+
         eleUp = new MoveElevatorToPosition(elevatorSS, 8);
         eleDown = new MoveElevatorToPosition(elevatorSS, 4);
+
+        intakeIn = new SetIntakePower(intakeSS, 1);
+        intakeIdle = new SetIntakePower(intakeSS, 0);
+        intakeOut = new SetIntakePower(intakeSS, -1);
 
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
@@ -64,6 +89,26 @@ public class Testing extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
                         .whenPressed(eleUp);
+
+//        driver.getGamepadButton(GamepadKeys.Button.A)
+//                .whileActiveContinuous(south);
+//
+//        driver.getGamepadButton(GamepadKeys.Button.B)
+//                .whileActiveContinuous(east);
+//
+//        driver.getGamepadButton(GamepadKeys.Button.Y)
+//                .whileActiveContinuous(north);
+//
+//        driver.getGamepadButton(GamepadKeys.Button.X)
+//                .whileActiveContinuous(west);
+
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenActive(intakeOut)
+                .whenInactive(intakeIdle);
+        
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenActive(intakeIn)
+                .whenInactive(intakeIdle);
 
 
         loopAvg = new RollingAverage(50);
@@ -87,6 +132,9 @@ public class Testing extends CommandOpMode {
         telemetry.addData("ele target", elevatorSS.getEleGoal());
         telemetry.addData("ele setpoint", elevatorSS.getEleSetPoint());
         telemetry.addData("ele pos", elevatorSS.getElePos());
+        telemetry.addLine();
+        telemetry.addData("heading", driveSS.getHeading());
+        telemetry.addData("theta target", driveSS.getThetaTarget());
         telemetry.addLine();
         telemetry.addData("loop time", System.currentTimeMillis() - loopTime);
         telemetry.addData("loop avg", loopAvg.getAverage());

@@ -79,8 +79,8 @@ public class MecanumDrive {
     }
 
     public void driveRobotCentricPID(double strafeSpeed, double forwardSpeed, double turnSpeed, double gyroAngle) {
-        thetaTarget += turnSpeed * maxTurnSpeedPID;
-        turnSpeed = thetaController.calculate(gyroAngle, Math.toRadians(thetaTarget));
+        thetaTarget -= turnSpeed * maxTurnSpeedPID;
+        turnSpeed = -thetaController.calculate(gyroAngle, Math.toRadians(thetaTarget));
 
         double denominator = Math.max(Math.abs(forwardSpeed) + Math.abs(strafeSpeed) + Math.abs(turnSpeed), 1);
         double frontLeftPower = (forwardSpeed + strafeSpeed + turnSpeed) / denominator;
@@ -182,10 +182,14 @@ public class MecanumDrive {
         return turnSpeed;
     }
 
-    public double getTurnTarget() {
-        return theta;
+    public double getThetaTarget() {
+        return thetaTarget;
     }
 
+    public void setThetaTarget(double thetaTarget) {
+        this.thetaTarget = thetaTarget;
+
+    }
 
     public void driveWithMotorPowers(double frontLeftSpeed, double frontRightSpeed,
                                      double backLeftSpeed, double backRightSpeed) {

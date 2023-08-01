@@ -2,13 +2,13 @@ package org.firstinspires.ftc.teamcode.util.pid;
 
 public class PoofyPIDCoefficients {
 
-    private double kP = 0;
-    private double kI = 0;
-    private double kD = 0;
-    private double kV = 0;
-    private double kA = 0;
-    private double kS = 0;
-    private double kF = 0;
+    public double kP = 0;
+    public double kI = 0;
+    public double kD = 0;
+    public double kV = 0;
+    public double kA = 0;
+    public double kS = 0;
+    public double kF = 0;
 
     public PoofyPIDCoefficients(double kP, double kI, double kD) {
         this.kP = kP;

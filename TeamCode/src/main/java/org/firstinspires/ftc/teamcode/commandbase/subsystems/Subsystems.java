@@ -4,13 +4,16 @@ public class Subsystems {
 
     private final DrivetrainSubsystem drive;
     private final ElevatorSubsystem ele;
+    private final IntakeSubsystem intake;
 
     public Subsystems(
             DrivetrainSubsystem drive,
-            ElevatorSubsystem ele
+            ElevatorSubsystem ele,
+            IntakeSubsystem intake
     ) {
         this.drive = drive;
         this.ele = ele;
+        this.intake = intake;
     }
 
     public DrivetrainSubsystem getDrive() {
@@ -21,4 +24,7 @@ public class Subsystems {
         return ele;
     }
 
+    public IntakeSubsystem getIntake() {
+        return intake;
+    }
 }

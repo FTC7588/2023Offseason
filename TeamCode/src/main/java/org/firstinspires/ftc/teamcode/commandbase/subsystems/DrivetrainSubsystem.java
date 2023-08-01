@@ -71,4 +71,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return mode;
     }
 
+    public double getHeading() {
+        return Math.toDegrees(heading);
+    }
+
+    public double getThetaTarget() {
+        return drive.getThetaTarget();
+    }
+
+    public void setThetaTarget(double thetaTarget) {
+        drive.setThetaTarget(thetaTarget);
+    }
 }
