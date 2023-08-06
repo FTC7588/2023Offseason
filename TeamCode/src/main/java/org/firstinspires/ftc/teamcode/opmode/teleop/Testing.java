@@ -1,24 +1,24 @@
-package org.firstinspires.ftc.teamcode.opmode;
+package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RollingAverage;
 
-import org.firstinspires.ftc.teamcode.commandbase.commands.MoveElevatorToPosition;
-import org.firstinspires.ftc.teamcode.commandbase.commands.RobotCentricPID;
-import org.firstinspires.ftc.teamcode.commandbase.commands.SetHeadingTarget;
-import org.firstinspires.ftc.teamcode.commandbase.commands.SetIntakePower;
+import org.firstinspires.ftc.teamcode.commandbase.commands.elevator.MoveElevatorToPosition;
+import org.firstinspires.ftc.teamcode.commandbase.commands.drive.RobotCentricPID;
+import org.firstinspires.ftc.teamcode.commandbase.commands.drive.SetHeadingTarget;
+import org.firstinspires.ftc.teamcode.commandbase.commands.intake.SetIntakePower;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.ElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
-import java.util.Set;
-
 @TeleOp
+@Disabled
 public class Testing extends CommandOpMode {
 
     private final RobotHardware robot = RobotHardware.getInstance();
@@ -61,7 +61,7 @@ public class Testing extends CommandOpMode {
         elevatorSS = new ElevatorSubsystem(robot);
         intakeSS = new IntakeSubsystem(robot);
 
-        subsystems = new Subsystems(driveSS, elevatorSS, intakeSS);
+        //subsystems = new Subsystems(driveSS, elevatorSS, intakeSS);
 
 
         robotCentricPID = new RobotCentricPID(

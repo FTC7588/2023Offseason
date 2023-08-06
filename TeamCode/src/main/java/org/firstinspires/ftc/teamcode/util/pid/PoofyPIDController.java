@@ -2,13 +2,15 @@ package org.firstinspires.ftc.teamcode.util.pid;
 
 public class PoofyPIDController extends PoofyFeedForwardController {
 
-    private double kP = 0;
-    private double kI = 0;
-    private double kD = 0;
-    private double kV = 0;
-    private double kA = 0;
-    private double kS = 0;
-    private double kF = 0;
+    private double kP;
+    private double kI;
+    private double kD;
+    private double kV;
+    private double kA;
+    private double kS;
+    private double kF;
+
+    private double angle;
 
     private double targetPosition;
     private double targetVelocity;
@@ -24,6 +26,8 @@ public class PoofyPIDController extends PoofyFeedForwardController {
 
     private double positionTolerance;
     private double velocityTolerance;
+
+    private boolean angleFeedforward = false;
 
     private boolean inputBounded = false;
     private double minInput;
@@ -78,8 +82,13 @@ public class PoofyPIDController extends PoofyFeedForwardController {
                 + totalError * kI
                 + velocityError * kD
                 + targetVelocity * kV
-                + targetAcceleration * kA
-                + kF;
+                + targetAcceleration * kA;
+
+        if (angleFeedforward) {
+            output += kF * getSIN(angle);
+        } else {
+            output += kF;
+        }
 
         if (output == 0.0) {
             output = 0;
@@ -92,6 +101,15 @@ public class PoofyPIDController extends PoofyFeedForwardController {
         }
 
         return output;
+    }
+
+    private double getSIN(double angle) {
+        if (angle >= 90) {
+            angle = 180 - angle;
+        } else if (angle <= -90) {
+            angle = -180 - angle;
+        }
+        return Math.sin(Math.toRadians(angle));
     }
 
     public boolean atSetPoint() {
@@ -110,6 +128,18 @@ public class PoofyPIDController extends PoofyFeedForwardController {
 
     public void setTargetAcceleration(double targetAcceleration) {
         this.targetAcceleration = targetAcceleration;
+    }
+
+    public void enableAngleFeedforward() {
+        angleFeedforward = true;
+    }
+
+    public void disableAngleFeedforward() {
+        angleFeedforward = false;
+    }
+
+    public void setAngle(double angleDeg) {
+        angle = angleDeg;
     }
 
     //continuous

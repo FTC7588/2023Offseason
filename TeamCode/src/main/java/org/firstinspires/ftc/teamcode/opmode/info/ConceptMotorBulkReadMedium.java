@@ -27,15 +27,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmode;
+package org.firstinspires.ftc.teamcode.opmode.info;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.List;
 
@@ -81,15 +79,14 @@ Once you put all your sensor reads at the beginning of the control cycle, it's v
 the bulk-read AUTO mode to streamline your cycle timing.
 
 */
-@TeleOp (name = "Motor Bulk Reads - Big", group = "Tests")
-public class ConceptMotorBulkReadBig extends LinearOpMode {
+@TeleOp (name = "Motor Bulk Reads - Medium", group = "Tests")
+public class ConceptMotorBulkReadMedium extends LinearOpMode {
 
 final int       TEST_CYCLES    = 500;   // Number of control cycles to run to determine cycle times.
 
 private DcMotorEx m1, m2, m3, m4; // Motor Objects
 private long      e1, e2, e3, e4; // Encoder Values
 private double    v1, v2, v3, v4; // Velocities
-private double    c1, c2, c3, c4; // Currents
 
 // Cycle Times
 double t1 = 0;
@@ -139,11 +136,6 @@ public void runOpMode() {
         v3 = m3.getVelocity();
         v4 = m4.getVelocity();
 
-        c1 = m1.getCurrent(CurrentUnit.AMPS);
-        c2 = m2.getCurrent(CurrentUnit.AMPS);
-        c3 = m3.getCurrent(CurrentUnit.AMPS);
-        c4 = m4.getCurrent(CurrentUnit.AMPS);
-
         // Put Control loop action code here.
 
     }
@@ -173,11 +165,6 @@ public void runOpMode() {
         v2 = m2.getVelocity();
         v3 = m3.getVelocity();
         v4 = m4.getVelocity();
-
-        c1 = m1.getCurrent(CurrentUnit.AMPS);
-        c2 = m2.getCurrent(CurrentUnit.AMPS);
-        c3 = m3.getCurrent(CurrentUnit.AMPS);
-        c4 = m4.getCurrent(CurrentUnit.AMPS);
 
         // Put Control loop action code here.
 
@@ -215,11 +202,6 @@ public void runOpMode() {
         v2 = m2.getVelocity();
         v3 = m3.getVelocity();
         v4 = m4.getVelocity();
-
-        c1 = m1.getCurrent(CurrentUnit.AMPS);
-        c2 = m2.getCurrent(CurrentUnit.AMPS);
-        c3 = m3.getCurrent(CurrentUnit.AMPS);
-        c4 = m4.getCurrent(CurrentUnit.AMPS);
 
         // Put Control loop action code here.
 

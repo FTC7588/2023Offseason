@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.commandbase.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.util.RollingAverage;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+import org.firstinspires.ftc.teamcode.util.filters.MovingAverage;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
@@ -15,11 +15,11 @@ public class IntakeSubsystem extends SubsystemBase {
     private double targetPower;
 
     private double current;
-    private final RollingAverage avgCurrent;
+    private final MovingAverage avgCurrent;
 
     public IntakeSubsystem(RobotHardware robot) {
         this.robot = robot;
-        avgCurrent = new RollingAverage(INTAKE_AVG_SIZE);
+        avgCurrent = new MovingAverage(INTAKE_AVG_SIZE);
     }
 
 
@@ -52,7 +52,7 @@ public class IntakeSubsystem extends SubsystemBase {
         return current;
     }
 
-    public RollingAverage getAvgCurrent() {
-        return avgCurrent;
+    public double getAvgCurrent() {
+        return avgCurrent.getAverage();
     }
 }

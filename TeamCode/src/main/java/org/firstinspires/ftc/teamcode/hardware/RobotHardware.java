@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
@@ -21,19 +23,19 @@ import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 import java.util.List;
 
 public class RobotHardware {
-    public DcMotorEx fL;
-    public DcMotorEx fR;
-    public DcMotorEx rL;
-    public DcMotorEx rR;
+    public DcMotorEx fL, fR, rL, rR;
 
-    public DcMotorEx eleL;
-    public DcMotorEx eleR;
+    public DcMotorEx eleL, eleR;
+
+    public DcMotorEx arm;
 
     public ServoImplEx rotator;
 
     public CRServo intake;
 
     public IMU imu;
+
+    public CameraName camera;
 
     private List<LynxModule> hubs;
 
@@ -95,6 +97,15 @@ public class RobotHardware {
         eleR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
+        //arm
+        arm = hwMap.get(DcMotorEx.class, "arm");
+
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
         //rotator
         rotator = hwMap.get(ServoImplEx.class, "rotator");
 
@@ -113,6 +124,7 @@ public class RobotHardware {
                 RevHubOrientationOnRobot.LogoFacingDirection.FORWARD, RevHubOrientationOnRobot.UsbFacingDirection.UP));
         imu.initialize(parameters);
 
+        camera = hwMap.get(WebcamName.class, "Webcam 1");
     }
 
     public void read(Subsystems subsystems) {
@@ -120,18 +132,24 @@ public class RobotHardware {
         //calculateExpansionServoBusCurrent();
         subsystems.getDrive().read();
         subsystems.getEle().read();
+        subsystems.getArm().read();
+        subsystems.getRot().read();
         subsystems.getIntake().read();
     }
 
     public void loop(Subsystems subsystems) {
         subsystems.getDrive().loop();
         subsystems.getEle().loop();
+        subsystems.getArm().loop();
+        subsystems.getRot().loop();
         subsystems.getIntake().loop();
     }
 
     public void write(Subsystems subsystems) {
         subsystems.getDrive().write();
         subsystems.getEle().write();
+        subsystems.getArm().write();
+        subsystems.getRot().write();
         subsystems.getIntake().write();
     }
 

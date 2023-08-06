@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.commandbase.commands;
+package org.firstinspires.ftc.teamcode.commandbase.commands.intake;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
@@ -11,6 +11,7 @@ public class SetIntakePower extends CommandBase {
 
     public SetIntakePower(IntakeSubsystem intakeSubsystem, double power) {
         m_intakeSubsystem = intakeSubsystem;
+        addRequirements(m_intakeSubsystem);
         this.power = power;
     }
 
