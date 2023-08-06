@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.geometry;
+package org.firstinspires.ftc.teamcode.utils.geometry;
 
 public class Vector2d {
 

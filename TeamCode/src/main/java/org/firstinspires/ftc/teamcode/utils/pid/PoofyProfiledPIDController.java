@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.firstinspires.ftc.teamcode.util.pid;
+package org.firstinspires.ftc.teamcode.utils.pid;
 
-import org.firstinspires.ftc.teamcode.util.MathUtil;
-import org.firstinspires.ftc.teamcode.util.TrapezoidProfile;
+import org.firstinspires.ftc.teamcode.utils.MathUtil;
+import org.firstinspires.ftc.teamcode.utils.TrapezoidProfile;
 
 public class PoofyProfiledPIDController {
     private PoofyPIDController m_controller;

@@ -22,6 +22,8 @@ import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
 import java.util.List;
 
+import javax.annotation.concurrent.GuardedBy;
+
 public class RobotHardware {
     public DcMotorEx fL, fR, rL, rR;
 
@@ -33,8 +35,6 @@ public class RobotHardware {
 
     public CRServo intake;
 
-    public IMU imu;
-
     public CameraName camera;
 
     private List<LynxModule> hubs;
@@ -42,6 +42,7 @@ public class RobotHardware {
     public double controlHubServoCurrent;
     public double expansionHubServoCurrent;
 
+    public IMU imu;
 
     private static RobotHardware instance = null;
 

@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.util.filters;
+package org.firstinspires.ftc.teamcode.utils.filters;
 
-import org.firstinspires.ftc.teamcode.util.geometry.Pose3d;
-import org.firstinspires.ftc.teamcode.util.geometry.Rotation3d;
-import org.firstinspires.ftc.teamcode.util.geometry.Vector3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Vector3d;
 
 import java.util.Arrays;
 

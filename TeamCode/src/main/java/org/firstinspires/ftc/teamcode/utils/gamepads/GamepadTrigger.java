@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.gamepads;
+package org.firstinspires.ftc.teamcode.utils.gamepads;
 
 import androidx.annotation.NonNull;
 import com.arcrobotics.ftclib.command.button.Button;

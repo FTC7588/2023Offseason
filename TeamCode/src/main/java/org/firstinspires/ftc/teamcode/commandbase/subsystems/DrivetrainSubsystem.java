@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.enums.DriveMode;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.MecanumDrive;
+import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
@@ -65,6 +65,25 @@ public class DrivetrainSubsystem extends SubsystemBase {
             );
         }
         mode = DriveMode.ROBOT_CENTRIC;
+    }
+
+    public void fieldCentricMode(double strafeSpeed, double forwardSpeed, double turnSpeed, boolean pidTurning) {
+        if (!pidTurning) {
+            drive.driveFieldCentric(
+                    strafeSpeed,
+                    forwardSpeed,
+                    turnSpeed,
+                    heading
+            );
+        } else {
+            drive.driveFieldCentricPID(
+                    strafeSpeed,
+                    forwardSpeed,
+                    turnSpeed,
+                    heading
+            );
+        }
+        mode = DriveMode.FIELD_CENTRIC;
     }
 
     public DriveMode getMode() {

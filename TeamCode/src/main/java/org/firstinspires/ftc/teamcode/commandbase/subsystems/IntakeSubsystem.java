@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.commandbase.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.filters.MovingAverage;
+import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 

@@ -4,16 +4,16 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.PwmControl;
 
-import org.firstinspires.ftc.teamcode.util.CameraIntrinsics;
-import org.firstinspires.ftc.teamcode.util.geometry.Pose3d;
-import org.firstinspires.ftc.teamcode.util.geometry.Rotation3d;
-import org.firstinspires.ftc.teamcode.util.geometry.Vector3d;
-import org.firstinspires.ftc.teamcode.util.pid.PoofyPIDCoefficients;
-
-import java.util.function.DoubleSupplier;
+import org.firstinspires.ftc.teamcode.utils.CameraIntrinsics;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Vector3d;
+import org.firstinspires.ftc.teamcode.utils.pid.PoofyPIDCoefficients;
 
 @Config
 public class Constants {
+
+    public static boolean USING_IMU = true;
 
     public static boolean DEBUG_LOOPS = true;
 

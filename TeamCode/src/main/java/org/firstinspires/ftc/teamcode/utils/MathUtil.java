@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.utils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
-import org.firstinspires.ftc.teamcode.util.geometry.EulerAngles;
+import org.firstinspires.ftc.teamcode.utils.geometry.EulerAngles;
 
 public class MathUtil {
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.gamepads;
+package org.firstinspires.ftc.teamcode.utils.gamepads;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;

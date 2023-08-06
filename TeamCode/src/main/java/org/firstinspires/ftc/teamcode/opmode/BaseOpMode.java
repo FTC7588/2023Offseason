@@ -7,7 +7,6 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.DrivetrainSubsystem;
@@ -17,9 +16,9 @@ import org.firstinspires.ftc.teamcode.commandbase.subsystems.RotatorSubsystem;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
 import org.firstinspires.ftc.teamcode.hardware.Constants;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.filters.MovingAverage;
-import org.firstinspires.ftc.teamcode.util.gamepads.GamepadTrigger;
-import org.firstinspires.ftc.teamcode.util.gamepads.TriggerGamepadEx;
+import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
+import org.firstinspires.ftc.teamcode.utils.gamepads.GamepadTrigger;
+import org.firstinspires.ftc.teamcode.utils.gamepads.TriggerGamepadEx;
 
 public class BaseOpMode extends CommandOpModeEx {
 

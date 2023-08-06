@@ -5,9 +5,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.util.InterpLUT;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.util.TrapezoidProfile;
-import org.firstinspires.ftc.teamcode.util.pid.PoofyPIDController;
-import org.firstinspires.ftc.teamcode.util.pid.PoofyProfiledPIDController;
+import org.firstinspires.ftc.teamcode.utils.pid.PoofyPIDController;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 

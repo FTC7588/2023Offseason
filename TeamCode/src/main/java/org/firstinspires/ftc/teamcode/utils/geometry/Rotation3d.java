@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.util.geometry;
+package org.firstinspires.ftc.teamcode.utils.geometry;
 
 import android.annotation.SuppressLint;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
-import org.firstinspires.ftc.teamcode.util.MathUtil;
+import org.firstinspires.ftc.teamcode.utils.MathUtil;
 
 public class Rotation3d {
     private Quaternion q = new Quaternion();

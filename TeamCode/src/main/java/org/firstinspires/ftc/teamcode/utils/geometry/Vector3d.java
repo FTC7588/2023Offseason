@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.util.geometry;
+package org.firstinspires.ftc.teamcode.utils.geometry;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;

@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.util;
+package org.firstinspires.ftc.teamcode.utils;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.util.geometry.Vector2d;
-import org.firstinspires.ftc.teamcode.util.pid.PoofyPIDCoefficients;
-import org.firstinspires.ftc.teamcode.util.pid.PoofyPIDController;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Vector2d;
+import org.firstinspires.ftc.teamcode.utils.pid.PoofyPIDCoefficients;
+import org.firstinspires.ftc.teamcode.utils.pid.PoofyPIDController;
 
 public class MecanumDrive {
 
