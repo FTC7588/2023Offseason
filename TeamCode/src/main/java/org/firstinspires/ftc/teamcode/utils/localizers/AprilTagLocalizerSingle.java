@@ -2,6 +2,13 @@ package org.firstinspires.ftc.teamcode.utils.localizers;
 
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
@@ -20,7 +27,9 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AprilTagLocalizerSingle {
+public class AprilTagLocalizerSingle implements Localizer {
+
+    private final RobotHardware robot;
 
     private final Pose3d cameraPose;
 
@@ -31,12 +40,13 @@ public class AprilTagLocalizerSingle {
     private List<AprilTagDetection> tags;
 
     private Pose3d tagPose;
-
+    private Transform3d camToTag;
     private Pose3d camPose;
     private Transform3d robotToCam;
     private Pose3d robotPose;
+    private Pose3d pastRobotPose;
 
-    private Transform3d camToTarget;
+    private Pose2d poseVelocity;
 
     private Pose3d[] estimates;
 
@@ -44,12 +54,17 @@ public class AprilTagLocalizerSingle {
     private final MovingAverage pitchAverage;
     private final MovingAverage yawAverage;
 
+    private final ElapsedTime timer;
+
+    private double lastUpdateTime;
+
     public AprilTagLocalizerSingle(
             RobotHardware robot,
             Pose3d cameraPose,
             CameraIntrinsics cameraIntrinsics,
             int visionAverage
     ) {
+        this.robot = robot;
         this.cameraPose = cameraPose;
 
         tagProcessor = new AprilTagProcessor.Builder()
@@ -83,7 +98,7 @@ public class AprilTagLocalizerSingle {
         GainControl gain = visionPortal.getCameraControl(GainControl.class);
 
         exposure.setMode(ExposureControl.Mode.Manual);
-        exposure.setExposure(10, TimeUnit.MILLISECONDS);
+        exposure.setExposure(15, TimeUnit.MILLISECONDS);
 
         gain.setGain(255);
 
@@ -91,105 +106,79 @@ public class AprilTagLocalizerSingle {
         pitchAverage = new MovingAverage(visionAverage);
         yawAverage = new MovingAverage(visionAverage);
 
+        timer = new ElapsedTime();
+
+        pastRobotPose = new Pose3d();
+
         tags = tagProcessor.getDetections();
     }
 
     public void update() {
         tags = tagProcessor.getDetections();
 
-        //if tags need to be averaged
-        if (tags.size() > 1) {
-            estimates = new Pose3d[tags.size()];
+        estimates = new Pose3d[tags.size()];
 
-            for (int i = 0; i < tags.size(); i++) {
-                AprilTagDetection tag = tags.get(i);
+        for (int i = 0; i < tags.size(); i++) {
+            AprilTagDetection tag = tags.get(i);
 
-                if (tag != null) {
+            targetTag = tag;
 
-                    tagPose = new Pose3d(
-                            new Vector3d(tag.metadata.fieldPosition),
-                            new Rotation3d(tag.metadata.fieldOrientation)
-                    );
-
-                    camToTarget = new Transform3d(
-                            new Vector3d(
-                                    tag.ftcPose.x,
-                                    tag.ftcPose.y,
-                                    tag.ftcPose.z
-                            ),
-                            new Rotation3d(
-                                    Math.toRadians(tag.ftcPose.roll),
-                                    Math.toRadians(tag.ftcPose.pitch),
-                                    Math.toRadians(tag.ftcPose.yaw)
-                            )
-                    );
-
-                    estimates[i] = tagPose.transformBy(camToTarget.inverse());
-                }
-            }
-
-            camPose = WeightedAverage.getWeightedAverage(estimates, 2);
-
-            rollAverage.addNumber(camPose.getRotation().getX());
-            pitchAverage.addNumber(camPose.getRotation().getY());
-            yawAverage.addNumber(camPose.getRotation().getZ());
-
-            camPose = new Pose3d(
-                    camPose.getVector(),
-                    new Rotation3d(
-                            rollAverage.getAverage(),
-                            pitchAverage.getAverage(),
-                            yawAverage.getAverage()
-                    )
-            );
-
-            robotToCam = new Transform3d(
-                    cameraPose.getVector(),
-                    cameraPose.getRotation()
-            );
-
-            robotPose = camPose.transformBy(robotToCam.inverse());
-
-        }
-        //if only one tag is seen
-        else if (tags.size() == 1) {
-
-            targetTag = tags.get(0);
-
-            if (targetTag != null) {
-
-                rollAverage.addNumber(targetTag.ftcPose.roll);
-                pitchAverage.addNumber(targetTag.ftcPose.pitch);
-                yawAverage.addNumber(targetTag.ftcPose.yaw);
+            if (tag != null) {
 
                 tagPose = new Pose3d(
-                        new Vector3d(targetTag.metadata.fieldPosition),
-                        new Rotation3d(targetTag.metadata.fieldOrientation)
+                        new Vector3d(tag.metadata.fieldPosition),
+                        new Rotation3d(tag.metadata.fieldOrientation)
                 );
 
-                camToTarget = new Transform3d(
+                camToTag = new Transform3d(
                         new Vector3d(
-                                targetTag.ftcPose.x,
-                                targetTag.ftcPose.y,
-                                targetTag.ftcPose.z
+                                tag.ftcPose.x,
+                                tag.ftcPose.y,
+                                tag.ftcPose.z
                         ),
                         new Rotation3d(
-                                Math.toRadians(rollAverage.getAverage()),
-                                Math.toRadians(pitchAverage.getAverage()),
-                                Math.toRadians(yawAverage.getAverage())
+                                Math.toRadians(tag.ftcPose.roll),
+                                Math.toRadians(tag.ftcPose.pitch),
+                                Math.toRadians(tag.ftcPose.yaw)
                         )
                 );
 
-                camPose = tagPose.transformBy(camToTarget.inverse());
-
-                robotToCam = new Transform3d(
-                        cameraPose.getVector(),
-                        cameraPose.getRotation()
-                );
-
-                robotPose = camPose.transformBy(robotToCam.inverse());
+                estimates[i] = tagPose.transformBy(camToTag.inverse());
             }
         }
+
+        camPose = WeightedAverage.getWeightedAverage(estimates, 2);
+
+        rollAverage.addNumber(camPose.getRotation().getX());
+        pitchAverage.addNumber(camPose.getRotation().getY());
+        yawAverage.addNumber(camPose.getRotation().getZ());
+
+        camPose = new Pose3d(
+                camPose.getVector(),
+                new Rotation3d(
+                        rollAverage.getAverage(),
+                        pitchAverage.getAverage(),
+                        yawAverage.getAverage()
+                )
+        );
+
+        robotToCam = new Transform3d(
+                cameraPose.getVector(),
+                cameraPose.getRotation()
+        );
+
+        robotPose = camPose.transformBy(robotToCam.inverse());
+
+        double dt = timer.seconds() - lastUpdateTime;
+
+        poseVelocity = new Pose2d(
+                (robotPose.getX() - pastRobotPose.getX()) / dt,
+                (robotPose.getY() - pastRobotPose.getY()) / dt,
+                robot.getHeadingVelocity()
+        );
+
+        lastUpdateTime = timer.seconds();
+        pastRobotPose = robotPose;
     }
 
 
@@ -202,8 +191,8 @@ public class AprilTagLocalizerSingle {
         return tagPose;
     }
 
-    public Transform3d getCamToTarget() {
-        return camToTarget;
+    public Transform3d getCamToTag() {
+        return camToTag;
     }
 
     public Pose3d getCamPose() {
@@ -222,4 +211,30 @@ public class AprilTagLocalizerSingle {
         return visionPortal.getFps();
     }
 
+
+    //roadrunner methods
+    @NonNull
+    @Override
+    public Pose2d getPoseEstimate() {
+        return new Pose2d(getRobotPose().toPose2d().x, getRobotPose().toPose2d().y, getRobotPose().toPose2d().theta);
+    }
+
+    @Override
+    public void setPoseEstimate(@NonNull Pose2d pose2d) {
+
+    }
+
+    @Nullable
+    @Override
+    public Pose2d getPoseVelocity() {
+        return poseVelocity;
+    }
+
+    public double getHeading() {
+        return robot.getHeading();
+    }
+
+    public Double getHeadingVelocity() {
+        return robot.getHeadingVelocity();
+    }
 }

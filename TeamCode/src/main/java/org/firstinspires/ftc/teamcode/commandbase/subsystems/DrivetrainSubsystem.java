@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.commandbase.subsystems;
 
+import com.acmerobotics.roadrunner.localization.Localizer;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -32,16 +33,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 DRIVE_MAX_TURN_SPEED_PID
         );
 
-
     }
 
 
     public void read() {
-        heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
     }
 
     public void loop() {
-
+        heading = robot.getHeading();
     }
 
     public void write() {

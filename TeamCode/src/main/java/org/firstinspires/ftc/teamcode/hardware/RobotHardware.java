@@ -13,9 +13,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
@@ -42,7 +44,12 @@ public class RobotHardware {
     public double controlHubServoCurrent;
     public double expansionHubServoCurrent;
 
+    public VoltageSensor batteryVoltageSensor;
+
     public IMU imu;
+
+    private double heading;
+    private double headingVelocity;
 
     private static RobotHardware instance = null;
 
@@ -68,21 +75,21 @@ public class RobotHardware {
 
 
         //drive
-        fL = hwMap.get(DcMotorEx.class, "fL");
-        fR = hwMap.get(DcMotorEx.class, "fR");
-        rL = hwMap.get(DcMotorEx.class, "rL");
-        rR = hwMap.get(DcMotorEx.class, "rR");
-
-        fL.setDirection(DcMotorSimple.Direction.REVERSE);
-        rL.setDirection(DcMotorSimple.Direction.REVERSE);
-        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        fL = hwMap.get(DcMotorEx.class, "fL");
+//        fR = hwMap.get(DcMotorEx.class, "fR");
+//        rL = hwMap.get(DcMotorEx.class, "rL");
+//        rR = hwMap.get(DcMotorEx.class, "rR");
+//
+//        fL.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rL.setDirection(DcMotorSimple.Direction.REVERSE);
+//        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        fL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        fR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        rR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         //elevator
@@ -126,11 +133,16 @@ public class RobotHardware {
         imu.initialize(parameters);
 
         camera = hwMap.get(WebcamName.class, "Webcam 1");
+
+
+        batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
     }
 
     public void read(Subsystems subsystems) {
         //calculateControlServoBusCurrent();
         //calculateExpansionServoBusCurrent();
+        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        headingVelocity = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
         subsystems.getDrive().read();
         subsystems.getEle().read();
         subsystems.getArm().read();
@@ -178,5 +190,17 @@ public class RobotHardware {
             expansionHubServoCurrent = servoResponse.getValue();
         } catch (InterruptedException | RuntimeException | LynxNackException ignored) {
         }
+    }
+
+    public HardwareMap getHwMap() {
+        return hwMap;
+    }
+
+    public double getHeading() {
+        return heading;
+    }
+
+    public double getHeadingVelocity() {
+        return headingVelocity;
     }
 }

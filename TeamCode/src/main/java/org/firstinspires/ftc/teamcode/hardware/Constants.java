@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.PwmControl;
 
@@ -68,9 +69,23 @@ public class Constants {
     //vision
     public static CameraIntrinsics C920_INTRINSICS = new CameraIntrinsics(504.041, 504.041, 307.462, 234.687);
     public static Pose3d CAMERA_POSE = new Pose3d(
-            new Vector3d(-5, 5, 5),
-            new Rotation3d(0, 0, 0)
+            new Vector3d(5.63, 5, 14.1339),
+            new Rotation3d(0, 0, Math.toRadians(10))
     );
     public static int VISION_AVG = 3;
+
+
+    //RR temp
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(2, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, 0);
+
+    public static double LATERAL_MULTIPLIER = 1.55844155844;
+
+    public static double VX_WEIGHT = 1;
+    public static double VY_WEIGHT = 1;
+    public static double OMEGA_WEIGHT = 1;
+
+
+
 
 }

@@ -26,46 +26,50 @@ public class WeightedAverage {
 
 
     public static Pose3d getWeightedAverage(Pose3d[] poses, double strength) {
-        //init new pose variables
-        double x = 0, y = 0, z = 0, roll = 0, pitch = 0, yaw = 0;
+        if (poses.length == 1) {
+            return poses[0];
+        } else {
+            //init new pose variables
+            double x = 0, y = 0, z = 0, roll = 0, pitch = 0, yaw = 0;
 
-        //initialize weights
-        double[] weights = new double[poses.length];
-        double maxWeight = 0;
+            //initialize weights
+            double[] weights = new double[poses.length];
+            double maxWeight = 0;
 
-        for (int i = 0; i < poses.length; i++) {
-            double w = pythagoreanTheorem(poses[i].getX(), poses[i].getY(), poses[i].getZ());
-            if (w > maxWeight) {
-                maxWeight = w;
+            for (Pose3d pose : poses) {
+                double w = pythagoreanTheorem(pose.getX(), pose.getY(), pose.getZ());
+                if (w > maxWeight) {
+                    maxWeight = w;
+                }
             }
+
+            double maxStrength = maxWeight * strength;
+
+            for (int i = 0; i < poses.length; i++) {
+                weights[i] = maxStrength - Math.abs(pythagoreanTheorem(poses[i].getX(), poses[i].getY(), poses[i].getZ()));
+
+                x += poses[i].getVector().getX() * weights[i];
+                y += poses[i].getVector().getY() * weights[i];
+                z += poses[i].getVector().getZ() * weights[i];
+                roll += poses[i].getRotation().getX() * weights[i];
+                pitch += poses[i].getRotation().getY() * weights[i];
+                yaw += poses[i].getRotation().getZ() * weights[i];
+            }
+
+            double weightsSum = Arrays.stream(weights).sum();
+
+            x /= weightsSum;
+            y /= weightsSum;
+            z /= weightsSum;
+            roll /= weightsSum;
+            pitch /= weightsSum;
+            yaw /= weightsSum;
+
+            return new Pose3d(
+                    new Vector3d(x, y, z),
+                    new Rotation3d(roll, pitch, yaw)
+            );
         }
-
-        double maxStrength = maxWeight * strength;
-
-        for (int i = 0; i < poses.length; i++) {
-            weights[i] = maxStrength - Math.abs(pythagoreanTheorem(poses[i].getX(), poses[i].getY(), poses[i].getZ()));
-
-            x += poses[i].getVector().getX() * weights[i];
-            y += poses[i].getVector().getY() * weights[i];
-            z += poses[i].getVector().getZ() * weights[i];
-            roll += poses[i].getRotation().getX() * weights[i];
-            pitch += poses[i].getRotation().getY() * weights[i];
-            yaw += poses[i].getRotation().getZ() * weights[i];
-        }
-
-        double weightsSum = Arrays.stream(weights).sum();
-
-        x /= weightsSum;
-        y /= weightsSum;
-        z /= weightsSum;
-        roll /= weightsSum;
-        pitch /= weightsSum;
-        yaw /= weightsSum;
-
-        return new Pose3d(
-                new Vector3d(x, y, z),
-                new Rotation3d(roll, pitch, yaw)
-        );
 
     }
 

@@ -1,22 +1,29 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import org.firstinspires.ftc.teamcode.commandbase.commands.arm.SetArmAngle;
+import org.firstinspires.ftc.teamcode.commandbase.commands.drive.FieldCentricPID;
+import org.firstinspires.ftc.teamcode.commandbase.commands.drive.TagTrajectory;
 import org.firstinspires.ftc.teamcode.commandbase.commands.elevator.MoveElevatorToPosition;
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.RobotCentricPID;
 import org.firstinspires.ftc.teamcode.commandbase.commands.intake.SetIntakePower;
 import org.firstinspires.ftc.teamcode.commandbase.commands.rotator.SetRotatorPosition;
+import org.firstinspires.ftc.teamcode.commandbase.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.opmode.BaseOpMode;
 import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizerSingle;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
 public class Basic extends BaseOpMode {
 
     private RobotCentricPID robotCentricPID;
+    private FieldCentricPID fieldCentricPID;
 
     private MoveElevatorToPosition eleUp;
     private MoveElevatorToPosition eleDown;
@@ -31,6 +38,8 @@ public class Basic extends BaseOpMode {
     private SetIntakePower intakeIdle;
     private SetIntakePower intakeOut;
 
+    private TagTrajectory tagTrajectory;
+
     private AprilTagLocalizerSingle tagLocalizer;
 
     @Override
@@ -39,6 +48,13 @@ public class Basic extends BaseOpMode {
 
         //drive commands
         robotCentricPID = new RobotCentricPID(
+                driveSS,
+                () -> driver.getLeftX(),
+                () -> driver.getLeftY(),
+                () -> driver.getRightX()
+        );
+
+        fieldCentricPID = new FieldCentricPID(
                 driveSS,
                 () -> driver.getLeftX(),
                 () -> driver.getLeftY(),
@@ -62,6 +78,11 @@ public class Basic extends BaseOpMode {
         intakeIdle = new SetIntakePower(intakeSS, 0);
         intakeOut = new SetIntakePower(intakeSS, -1);
 
+        //tagTrajectory = new TagTrajectory(driveSS, new Pose2d());
+
+
+        //drive controls
+        gp1(A, 1).toggleWhenActive(fieldCentricPID, robotCentricPID);
 
         //ele controls
         gp1(DPAD_UP, 1).whenActive(eleUp);
@@ -79,8 +100,10 @@ public class Basic extends BaseOpMode {
         gp1(RIGHT_BUMPER, 1).whenActive(intakeIn).whenInactive(intakeIdle);
 
 
+        //gp1(A, 1).whenActive(tagTrajectory);
+
         //instantiate localizer
-        tagLocalizer = new AprilTagLocalizerSingle(robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
+        //tagLocalizer = new AprilTagLocalizerSingle(robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
 
 
         //init commands
@@ -107,19 +130,30 @@ public class Basic extends BaseOpMode {
         robot.read(subsystems);
 
         robot.loop(subsystems);
-        tagLocalizer.update();
+        //tagLocalizer.update();
         robot.write(subsystems);
 
-        if (tagLocalizer.getTargetTag() != null) {
-            tad("x", tagLocalizer.getCamPose().getX());
-            tad("y", tagLocalizer.getCamPose().getY());
-            tad("z", tagLocalizer.getCamPose().getZ());
-            tal();
-            tad("filtered roll", tagLocalizer.getCamPose().getRotation().getX());
-            tad("filtered pitch", tagLocalizer.getCamPose().getRotation().getY());
-            tad("filtered yaw", tagLocalizer.getCamPose().getRotation().getZ());
-            tal();
-        }
+
+
+//        if (tagLocalizer.getTargetTag() != null) {
+//            tad("x", tagLocalizer.getCamPose().getX());
+//            tad("y", tagLocalizer.getCamPose().getY());
+//            tad("z", tagLocalizer.getCamPose().getZ());
+//            tal();
+//            tad("filtered roll", tagLocalizer.getCamPose().getRotation().getX());
+//            tad("filtered pitch", tagLocalizer.getCamPose().getRotation().getY());
+//            tad("filtered yaw", tagLocalizer.getCamPose().getRotation().getZ());
+//            tal();
+//        }
+//
+//        assert tagLocalizer.getPoseVelocity() != null;
+//        tal(String.format(tagLocalizer.getPoseVelocity().toString()));
+//        tal();
+        tad("scheduled", tagTrajectory.isScheduled());
+        tal();
+
+        tad("drive mode", driveSS.getMode());
+        tal();
         tau();
 
         robot.clearBulkCache();
