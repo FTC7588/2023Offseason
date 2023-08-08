@@ -132,16 +132,16 @@ public class Basic extends BaseOpMode {
 
 
 
-//        if (driveSS.isDetected()) {
-//            tad("x", driveSS.getCamPose().getX());
-//            tad("y", driveSS.getCamPose().getY());
-//            tad("z", driveSS.getCamPose().getZ());
-//            tal();
-//            tad("filtered roll", driveSS.getCamPose().getRotation().getX());
-//            tad("filtered pitch", driveSS.getCamPose().getRotation().getY());
-//            tad("filtered yaw", driveSS.getCamPose().getRotation().getZ());
-//            tal();
-//        }
+        if (driveSS.isDetected()) {
+            tad("x", driveSS.getCamPose().getX());
+            tad("y", driveSS.getCamPose().getY());
+            tad("z", driveSS.getCamPose().getZ());
+            tal();
+            tad("filtered roll", Math.toDegrees(driveSS.getCamPose().getRotation().getX()));
+            tad("filtered pitch", Math.toDegrees(driveSS.getCamPose().getRotation().getY()));
+            tad("filtered yaw", Math.toDegrees(driveSS.getCamPose().getRotation().getZ()));
+            tal();
+        }
 
         tad("roll", Math.toDegrees(robot.getRoll()));
         tad("pitch", Math.toDegrees(robot.getPitch()));

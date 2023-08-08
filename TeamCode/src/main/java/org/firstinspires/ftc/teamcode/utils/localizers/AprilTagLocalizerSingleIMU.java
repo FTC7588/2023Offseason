@@ -148,7 +148,7 @@ public class AprilTagLocalizerSingleIMU implements Localizer {
                         ),
                         new Rotation3d(
                                 Math.toRadians(tag.ftcPose.roll),
-                                Math.toRadians(tag.ftcPose.pitch),
+                                robotAngles.pitch + tagPose.getRotation().getY(),
                                 Math.toRadians(tag.ftcPose.yaw)
                         )
                 );

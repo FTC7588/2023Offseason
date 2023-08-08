@@ -138,6 +138,12 @@ public class RobotHardware {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
         imu.initialize(parameters);
 
+        angles = new EulerAngles(
+                imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS),
+                imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS),
+                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
+        );
+
         camera = hwMap.get(WebcamName.class, "Webcam 1");
 
 
