@@ -23,8 +23,8 @@ public class Constants {
     public static GamepadKeys.Trigger CONTROL_LAYER_3 = GamepadKeys.Trigger.RIGHT_TRIGGER;
 
     //drive
-    public static PoofyPIDCoefficients DRIVE_X_COEFFS = new PoofyPIDCoefficients(0, 0, 0, 0, 0, 0, 0);
-    public static PoofyPIDCoefficients DRIVE_Y_COEFFS = new PoofyPIDCoefficients(0, 0, 0, 0, 0, 0, 0);
+    public static PoofyPIDCoefficients DRIVE_X_COEFFS = new PoofyPIDCoefficients(0.05, 0, 0, 0, 0, 0.01, 0);
+    public static PoofyPIDCoefficients DRIVE_Y_COEFFS = new PoofyPIDCoefficients(0.05, 0, 0, 0, 0, 0.01, 0);
     public static PoofyPIDCoefficients DRIVE_THETA_COEFFS = new PoofyPIDCoefficients(1, 0, 0, 0, 0, 0, 0);
     public static double DRIVE_MAX_TURN_SPEED_PID = 8;
 

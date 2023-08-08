@@ -2,21 +2,17 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import org.firstinspires.ftc.teamcode.commandbase.commands.arm.SetArmAngle;
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.FieldCentricPID;
-import org.firstinspires.ftc.teamcode.commandbase.commands.drive.TagTrajectory;
+import org.firstinspires.ftc.teamcode.commandbase.commands.drive.FollowTag;
 import org.firstinspires.ftc.teamcode.commandbase.commands.elevator.MoveElevatorToPosition;
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.RobotCentricPID;
 import org.firstinspires.ftc.teamcode.commandbase.commands.intake.SetIntakePower;
 import org.firstinspires.ftc.teamcode.commandbase.commands.rotator.SetRotatorPosition;
-import org.firstinspires.ftc.teamcode.commandbase.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.opmode.BaseOpMode;
-import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizerSingle;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
@@ -24,6 +20,7 @@ public class Basic extends BaseOpMode {
 
     private RobotCentricPID robotCentricPID;
     private FieldCentricPID fieldCentricPID;
+    private FollowTag followTag;
 
     private MoveElevatorToPosition eleUp;
     private MoveElevatorToPosition eleDown;
@@ -38,13 +35,14 @@ public class Basic extends BaseOpMode {
     private SetIntakePower intakeIdle;
     private SetIntakePower intakeOut;
 
-    private TagTrajectory tagTrajectory;
 
-    private AprilTagLocalizerSingle tagLocalizer;
+    protected Pose2d followPose = new Pose2d(5, 40, 0);
 
     @Override
     public void initialize() {
         super.initialize();
+
+        robot.resetIMU();
 
         //drive commands
         robotCentricPID = new RobotCentricPID(
@@ -60,6 +58,8 @@ public class Basic extends BaseOpMode {
                 () -> driver.getLeftY(),
                 () -> driver.getRightX()
         );
+
+        followTag = new FollowTag(driveSS, followPose);
 
         //elevator commands
         eleUp = new MoveElevatorToPosition(eleSS, 8);
@@ -78,11 +78,12 @@ public class Basic extends BaseOpMode {
         intakeIdle = new SetIntakePower(intakeSS, 0);
         intakeOut = new SetIntakePower(intakeSS, -1);
 
-        //tagTrajectory = new TagTrajectory(driveSS, new Pose2d());
-
 
         //drive controls
-        gp1(A, 1).toggleWhenActive(fieldCentricPID, robotCentricPID);
+        gp1(A, 2).whenActive(followTag);
+        gp1(X, 2).whenActive(robotCentricPID);
+        gp1(B, 2).whenActive(fieldCentricPID);
+
 
         //ele controls
         gp1(DPAD_UP, 1).whenActive(eleUp);
@@ -99,15 +100,12 @@ public class Basic extends BaseOpMode {
         gp1(LEFT_BUMPER, 1).whenActive(intakeOut).whenInactive(intakeIdle);
         gp1(RIGHT_BUMPER, 1).whenActive(intakeIn).whenInactive(intakeIdle);
 
-
-        //gp1(A, 1).whenActive(tagTrajectory);
-
-        //instantiate localizer
-        //tagLocalizer = new AprilTagLocalizerSingle(robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
+        //imu controls
+        gp1(A, 3).whenActive(robot::resetIMU);
 
 
         //init commands
-        robotCentricPID.schedule();
+        //robotCentricPID.schedule();
         rotForward.schedule();
 
         tal("Ready");
@@ -130,27 +128,24 @@ public class Basic extends BaseOpMode {
         robot.read(subsystems);
 
         robot.loop(subsystems);
-        //tagLocalizer.update();
         robot.write(subsystems);
 
 
 
-//        if (tagLocalizer.getTargetTag() != null) {
-//            tad("x", tagLocalizer.getCamPose().getX());
-//            tad("y", tagLocalizer.getCamPose().getY());
-//            tad("z", tagLocalizer.getCamPose().getZ());
+//        if (driveSS.isDetected()) {
+//            tad("x", driveSS.getCamPose().getX());
+//            tad("y", driveSS.getCamPose().getY());
+//            tad("z", driveSS.getCamPose().getZ());
 //            tal();
-//            tad("filtered roll", tagLocalizer.getCamPose().getRotation().getX());
-//            tad("filtered pitch", tagLocalizer.getCamPose().getRotation().getY());
-//            tad("filtered yaw", tagLocalizer.getCamPose().getRotation().getZ());
+//            tad("filtered roll", driveSS.getCamPose().getRotation().getX());
+//            tad("filtered pitch", driveSS.getCamPose().getRotation().getY());
+//            tad("filtered yaw", driveSS.getCamPose().getRotation().getZ());
 //            tal();
 //        }
-//
-//        assert tagLocalizer.getPoseVelocity() != null;
-//        tal(String.format(tagLocalizer.getPoseVelocity().toString()));
-//        tal();
-        tad("scheduled", tagTrajectory.isScheduled());
-        tal();
+
+        tad("roll", Math.toDegrees(robot.getRoll()));
+        tad("pitch", Math.toDegrees(robot.getPitch()));
+        tad("heading", Math.toDegrees(robot.getHeading()));
 
         tad("drive mode", driveSS.getMode());
         tal();

@@ -50,7 +50,7 @@ public class Experiment extends CommandOpModeEx {
 
         robot.init(hardwareMap);
 
-        driveSS = new SampleMecanumDrive(robot, hardwareMap);
+        driveSS = new SampleMecanumDrive(hardwareMap, robot);
 
         driver = new GamepadEx(gamepad1);
         driverEx = new TriggerGamepadEx(gamepad1, driver);

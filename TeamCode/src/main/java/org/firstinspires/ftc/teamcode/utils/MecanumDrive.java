@@ -166,7 +166,7 @@ public class MecanumDrive {
         double turnSpeed = thetaController.calculate(Math.toRadians(targetFollowingPose.getTheta()), Math.toRadians(tagPose.getTheta()));
 
         driveRobotCentric(
-                -strafeSpeed,
+                strafeSpeed,
                 -forwardSpeed,
                 turnSpeed
         );

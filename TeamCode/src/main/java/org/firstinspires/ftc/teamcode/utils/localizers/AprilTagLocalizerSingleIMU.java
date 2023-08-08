@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
 import org.firstinspires.ftc.teamcode.utils.CameraIntrinsics;
 import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
 import org.firstinspires.ftc.teamcode.utils.filters.WeightedAverage;
+import org.firstinspires.ftc.teamcode.utils.geometry.EulerAngles;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Transform3d;
@@ -27,7 +28,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AprilTagLocalizerSingle implements Localizer {
+public class AprilTagLocalizerSingleIMU implements Localizer {
 
     private final RobotHardware robot;
 
@@ -50,6 +51,8 @@ public class AprilTagLocalizerSingle implements Localizer {
 
     private Pose3d[] estimates;
 
+    private EulerAngles robotAngles;
+
     private final MovingAverage rollAverage;
     private final MovingAverage pitchAverage;
     private final MovingAverage yawAverage;
@@ -60,7 +63,7 @@ public class AprilTagLocalizerSingle implements Localizer {
 
     private boolean detected = false;
 
-    public AprilTagLocalizerSingle(
+    public AprilTagLocalizerSingleIMU(
             RobotHardware robot,
             Pose3d cameraPose,
             CameraIntrinsics cameraIntrinsics,
@@ -116,6 +119,7 @@ public class AprilTagLocalizerSingle implements Localizer {
     }
 
     public void update() {
+        robotAngles = robot.getRobotAngles();
         tags = tagProcessor.getDetections();
 
         estimates = new Pose3d[tags.size()];

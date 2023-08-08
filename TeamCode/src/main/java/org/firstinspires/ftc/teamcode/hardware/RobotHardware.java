@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCCommand;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.commandbase.subsystems.Subsystems;
+import org.firstinspires.ftc.teamcode.utils.geometry.EulerAngles;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
@@ -48,8 +50,12 @@ public class RobotHardware {
 
     public IMU imu;
 
-    private double heading;
+    private double rollOffset;
+    private double pitchOffset;
+    private double headingOffset;
     private double headingVelocity;
+
+    private EulerAngles angles;
 
     private static RobotHardware instance = null;
 
@@ -75,21 +81,21 @@ public class RobotHardware {
 
 
         //drive
-//        fL = hwMap.get(DcMotorEx.class, "fL");
-//        fR = hwMap.get(DcMotorEx.class, "fR");
-//        rL = hwMap.get(DcMotorEx.class, "rL");
-//        rR = hwMap.get(DcMotorEx.class, "rR");
-//
-//        fL.setDirection(DcMotorSimple.Direction.REVERSE);
-//        rL.setDirection(DcMotorSimple.Direction.REVERSE);
-//        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        rR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        fL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        fR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        rR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fL = hwMap.get(DcMotorEx.class, "fL");
+        fR = hwMap.get(DcMotorEx.class, "fR");
+        rL = hwMap.get(DcMotorEx.class, "rL");
+        rR = hwMap.get(DcMotorEx.class, "rR");
+
+        fL.setDirection(DcMotorSimple.Direction.REVERSE);
+        rL.setDirection(DcMotorSimple.Direction.REVERSE);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         //elevator
@@ -129,7 +135,7 @@ public class RobotHardware {
 
         imu = hwMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.FORWARD, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
         imu.initialize(parameters);
 
         camera = hwMap.get(WebcamName.class, "Webcam 1");
@@ -141,8 +147,11 @@ public class RobotHardware {
     public void read(Subsystems subsystems) {
         //calculateControlServoBusCurrent();
         //calculateExpansionServoBusCurrent();
-        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        headingVelocity = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+        angles.roll = imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS);
+        angles.pitch = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
+        angles.yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        //headingVelocity = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+
         subsystems.getDrive().read();
         subsystems.getEle().read();
         subsystems.getArm().read();
@@ -196,11 +205,29 @@ public class RobotHardware {
         return hwMap;
     }
 
+    public double getRoll() {
+        return angles.roll - rollOffset;
+    }
+
+    public double getPitch() {
+        return angles.pitch - pitchOffset;
+    }
+
     public double getHeading() {
-        return heading;
+        return angles.yaw - headingOffset;
     }
 
     public double getHeadingVelocity() {
         return headingVelocity;
+    }
+
+    public void resetIMU() {
+        rollOffset = imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS);
+        pitchOffset = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
+        headingOffset = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    }
+
+    public EulerAngles getRobotAngles() {
+        return new EulerAngles(getRoll(), getPitch(), getHeading());
     }
 }
