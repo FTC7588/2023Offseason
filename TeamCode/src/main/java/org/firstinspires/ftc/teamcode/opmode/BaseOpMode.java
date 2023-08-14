@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -21,7 +22,7 @@ import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
 import org.firstinspires.ftc.teamcode.utils.gamepads.GamepadTrigger;
 import org.firstinspires.ftc.teamcode.utils.gamepads.TriggerGamepadEx;
 
-public class BaseOpMode extends CommandOpModeEx {
+public class BaseOpMode extends CommandOpMode {
 
     protected final RobotHardware robot = RobotHardware.getInstance();
 

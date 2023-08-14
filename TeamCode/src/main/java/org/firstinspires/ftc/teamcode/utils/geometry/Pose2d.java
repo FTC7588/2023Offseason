@@ -39,8 +39,8 @@ public class Pose2d {
         return new Vector2d(Math.cos(theta), Math.sin(theta));
     }
 
-    public Pose2d plus(Pose2d other) {
-        return new Pose2d(this.x + other.x, this.y + other.y, this.theta + other.theta);
+    public Pose2d plus(Transform2d other) {
+        return transformBy(other);
     }
 
     public Pose2d minus(Pose2d other) {
@@ -53,6 +53,18 @@ public class Pose2d {
 
     public Pose2d div(double scalar) {
         return new Pose2d(x / scalar, y / scalar, theta / scalar);
+    }
+
+    public Pose2d transformBy(Transform2d other) {
+        return new Pose2d(
+                new Vector2d(x, y).add(other.getVector().rotateBy(theta)),
+                theta + other.getRotation()
+        );
+    }
+
+    public Pose2d relativeTo(Pose2d other) {
+        Transform2d transform2d = new Transform2d(other, this);
+        return new Pose2d(transform2d.getVector(), transform2d.getRotation());
     }
 
     @SuppressLint("DefaultLocale")

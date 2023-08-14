@@ -6,8 +6,8 @@ import org.firstinspires.ftc.teamcode.enums.DriveMode;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
-import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizerSingle;
+import org.firstinspires.ftc.teamcode.utils.geometry.Transform2d;
+import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizer2dSingle;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
@@ -20,7 +20,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final MecanumDrive drive;
     private DriveMode mode;
 
-    private AprilTagLocalizerSingle tagLocalizer;
+    private Pose2d robotPose;
+
+
+
+    private final AprilTagLocalizer2dSingle tagLocalizer;
 
     public DrivetrainSubsystem(RobotHardware robot) {
         this.robot = robot;
@@ -36,7 +40,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 DRIVE_MAX_TURN_SPEED_PID
         );
 
-        tagLocalizer = new AprilTagLocalizerSingle(robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
+        tagLocalizer = new AprilTagLocalizer2dSingle(robot, CAMERA_POSE.toPose2d(), C920_INTRINSICS, VISION_AVG);
+
+        robotPose = new Pose2d(0, 0, 0);
     }
 
 
@@ -47,15 +53,30 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void loop() {
         heading = robot.getHeading();
         tagLocalizer.update();
+        if (tagLocalizer.isDetected()) {
+            robotPose = tagLocalizer.getCamPose();
+        }
     }
 
     public void write() {
         drive.write();
     }
 
+    public Pose2d getRobotPose() {
+        return robotPose;
+    }
 
-    public Pose3d getCamPose() {
+
+    public Pose2d getTagPose() {
+        return tagLocalizer.getTagPose();
+    }
+
+    public Pose2d getCamPose() {
         return tagLocalizer.getCamPose();
+    }
+
+    public Transform2d getCamToTag() {
+        return tagLocalizer.getCamToTag();
     }
 
 
@@ -102,7 +123,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
                     new Pose2d(
                             getCamPose().getX(),
                             getCamPose().getY(),
-                            Math.toDegrees(getCamPose().getRotation().getZ())
+                            Math.toDegrees(getCamPose().getTheta())
                     ),
                     followPose
             );

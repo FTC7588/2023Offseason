@@ -11,16 +11,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+
 import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
 import org.firstinspires.ftc.teamcode.utils.CameraIntrinsics;
 import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
 import org.firstinspires.ftc.teamcode.utils.filters.WeightedAverage;
-import org.firstinspires.ftc.teamcode.utils.geometry.EulerAngles;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Transform3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Vector3d;
+
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -28,7 +30,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AprilTagLocalizerSingleIMU implements Localizer {
+public class AprilTagLocalizer3dSingle implements Localizer {
 
     private final RobotHardware robot;
 
@@ -51,8 +53,6 @@ public class AprilTagLocalizerSingleIMU implements Localizer {
 
     private Pose3d[] estimates;
 
-    private EulerAngles robotAngles;
-
     private final MovingAverage rollAverage;
     private final MovingAverage pitchAverage;
     private final MovingAverage yawAverage;
@@ -63,7 +63,7 @@ public class AprilTagLocalizerSingleIMU implements Localizer {
 
     private boolean detected = false;
 
-    public AprilTagLocalizerSingleIMU(
+    public AprilTagLocalizer3dSingle(
             RobotHardware robot,
             Pose3d cameraPose,
             CameraIntrinsics cameraIntrinsics,
@@ -119,7 +119,6 @@ public class AprilTagLocalizerSingleIMU implements Localizer {
     }
 
     public void update() {
-        robotAngles = robot.getRobotAngles();
         tags = tagProcessor.getDetections();
 
         estimates = new Pose3d[tags.size()];
@@ -140,6 +139,11 @@ public class AprilTagLocalizerSingleIMU implements Localizer {
                         new Rotation3d(tag.metadata.fieldOrientation)
                 );
 
+                Transform3d coordinateRotate = new Transform3d(
+                        new Vector3d(0, 0, 0),
+                        new Rotation3d(0, 0, Math.toRadians(90))
+                );
+
                 camToTag = new Transform3d(
                         new Vector3d(
                                 tag.ftcPose.x,
@@ -148,31 +152,32 @@ public class AprilTagLocalizerSingleIMU implements Localizer {
                         ),
                         new Rotation3d(
                                 Math.toRadians(tag.ftcPose.roll),
-                                robotAngles.pitch + tagPose.getRotation().getY(),
-                                Math.toRadians(tag.ftcPose.yaw)
+                                Math.toRadians(tag.ftcPose.pitch),
+                                Math.toRadians(tag.ftcPose.yaw - 90)
                         )
                 );
 
-                estimates[i] = tagPose.transformBy(camToTag.inverse());
+                estimates[i] = tagPose.transformBy(camToTag.inverse()).transformBy(coordinateRotate);
             }
         }
 
-        camPose = WeightedAverage.getWeightedAverage(estimates, 2);
+        camPose = WeightedAverage.getWeightedAverage3d(estimates, 2);
+//        camPose = estimates[0];
 
-        if (detected) {
-            rollAverage.addNumber(camPose.getRotation().getX());
-            pitchAverage.addNumber(camPose.getRotation().getY());
-            yawAverage.addNumber(camPose.getRotation().getZ());
-        }
-
-        camPose = new Pose3d(
-                camPose.getVector(),
-                new Rotation3d(
-                        rollAverage.getAverage(),
-                        pitchAverage.getAverage(),
-                        yawAverage.getAverage()
-                )
-        );
+//        if (detected) {
+//            rollAverage.addNumber(camPose.getRotation().getX());
+//            pitchAverage.addNumber(camPose.getRotation().getY());
+//            yawAverage.addNumber(camPose.getRotation().getZ());
+//        }
+//
+//        camPose = new Pose3d(
+//                camPose.getVector(),
+//                new Rotation3d(
+//                        rollAverage.getAverage(),
+//                        pitchAverage.getAverage(),
+//                        yawAverage.getAverage()
+//                )
+//        );
 
         robotToCam = new Transform3d(
                 cameraPose.getVector(),

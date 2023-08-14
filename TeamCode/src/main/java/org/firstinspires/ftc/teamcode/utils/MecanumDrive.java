@@ -167,7 +167,7 @@ public class MecanumDrive {
 
         driveRobotCentric(
                 strafeSpeed,
-                -forwardSpeed,
+                forwardSpeed,
                 turnSpeed
         );
     }

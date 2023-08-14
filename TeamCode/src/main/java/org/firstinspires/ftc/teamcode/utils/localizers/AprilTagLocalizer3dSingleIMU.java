@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
 import org.firstinspires.ftc.teamcode.utils.CameraIntrinsics;
 import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
-import org.firstinspires.ftc.teamcode.utils.filters.WeightedAverage;
+import org.firstinspires.ftc.teamcode.utils.geometry.EulerAngles;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Transform3d;
@@ -27,7 +27,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AprilTagLocalizerSingle implements Localizer {
+public class AprilTagLocalizer3dSingleIMU implements Localizer {
 
     private final RobotHardware robot;
 
@@ -50,6 +50,8 @@ public class AprilTagLocalizerSingle implements Localizer {
 
     private Pose3d[] estimates;
 
+    private EulerAngles robotAngles;
+
     private final MovingAverage rollAverage;
     private final MovingAverage pitchAverage;
     private final MovingAverage yawAverage;
@@ -58,9 +60,12 @@ public class AprilTagLocalizerSingle implements Localizer {
 
     private double lastUpdateTime;
 
-    private boolean detected = false;
+    private double tagTime;
 
-    public AprilTagLocalizerSingle(
+    private boolean detected = false;
+    private boolean detectedOnce = false;
+
+    public AprilTagLocalizer3dSingleIMU(
             RobotHardware robot,
             Pose3d cameraPose,
             CameraIntrinsics cameraIntrinsics,
@@ -116,77 +121,87 @@ public class AprilTagLocalizerSingle implements Localizer {
     }
 
     public void update() {
+        robotAngles = robot.getRobotAngles();
         tags = tagProcessor.getDetections();
 
         estimates = new Pose3d[tags.size()];
 
         //boolean if tags are seen
         detected = tags.size() > 0;
+        if (detected) {
+            detectedOnce = true;
+        }
 
         //iterate through tags
-        for (int i = 0; i < tags.size(); i++) {
-            AprilTagDetection tag = tags.get(i);
-
-            targetTag = tag;
-
-            if (detected) {
-
-                tagPose = new Pose3d(
-                        new Vector3d(tag.metadata.fieldPosition),
-                        new Rotation3d(tag.metadata.fieldOrientation)
-                );
-
-                camToTag = new Transform3d(
-                        new Vector3d(
-                                tag.ftcPose.x,
-                                tag.ftcPose.y,
-                                tag.ftcPose.z
-                        ),
-                        new Rotation3d(
-                                Math.toRadians(tag.ftcPose.roll),
-                                Math.toRadians(tag.ftcPose.pitch),
-                                Math.toRadians(tag.ftcPose.yaw)
-                        )
-                );
-
-                estimates[i] = tagPose.transformBy(camToTag.inverse());
-            }
-        }
-
-        camPose = WeightedAverage.getWeightedAverage(estimates, 2);
-
         if (detected) {
-            rollAverage.addNumber(camPose.getRotation().getX());
-            pitchAverage.addNumber(camPose.getRotation().getY());
-            yawAverage.addNumber(camPose.getRotation().getZ());
+            for (int i = 0; i < tags.size(); i++) {
+                AprilTagDetection tag = tags.get(i);
+
+                targetTag = tag;
+
+                if (detected) {
+
+                    tagPose = new Pose3d(
+                            new Vector3d(tag.metadata.fieldPosition),
+                            new Rotation3d(tag.metadata.fieldOrientation)
+                    );
+
+                    camToTag = new Transform3d(
+                            new Vector3d(
+                                    tag.ftcPose.x,
+                                    tag.ftcPose.y,
+                                    tag.ftcPose.z
+                            ),
+                            new Rotation3d(
+                                    Math.toRadians(tag.ftcPose.roll),
+                                    Math.toRadians(tag.ftcPose.pitch),
+                                    -robot.getHeading() - tagPose.getRotation().getZ()
+                            )
+                    );
+
+                    estimates[i] = tagPose.transformBy(camToTag.inverse());
+                }
+            }
+
+//            camPose = WeightedAverage.getWeightedAverage(estimates, 2);
+            camPose = estimates[0];
+
+//            rollAverage.addNumber(camPose.getRotation().getX());
+//            pitchAverage.addNumber(camPose.getRotation().getY());
+//            yawAverage.addNumber(camPose.getRotation().getZ());
+//
+//            camPose = new Pose3d(
+//                    camPose.getVector(),
+//                    new Rotation3d(
+//                            rollAverage.getAverage(),
+//                            pitchAverage.getAverage(),
+//                            yawAverage.getAverage()
+//                    )
+//            );
+
+            robotToCam = new Transform3d(
+                    cameraPose.getVector(),
+                    cameraPose.getRotation()
+            );
+
+            robotPose = camPose.transformBy(robotToCam.inverse());
+
+            tagTime = targetTag.frameAcquisitionNanoTime;
         }
 
-        camPose = new Pose3d(
-                camPose.getVector(),
-                new Rotation3d(
-                        rollAverage.getAverage(),
-                        pitchAverage.getAverage(),
-                        yawAverage.getAverage()
-                )
-        );
+        if (detectedOnce) {
+            double dt = timer.seconds() - lastUpdateTime;
 
-        robotToCam = new Transform3d(
-                cameraPose.getVector(),
-                cameraPose.getRotation()
-        );
+            poseVelocity = new Pose2d(
+                    (robotPose.getX() - pastRobotPose.getX()) / dt,
+                    (robotPose.getY() - pastRobotPose.getY()) / dt,
+                    robot.getHeadingVelocity()
+            );
 
-        robotPose = camPose.transformBy(robotToCam.inverse());
+            lastUpdateTime = timer.seconds();
+            pastRobotPose = robotPose;
+        }
 
-        double dt = timer.seconds() - lastUpdateTime;
-
-        poseVelocity = new Pose2d(
-                (robotPose.getX() - pastRobotPose.getX()) / dt,
-                (robotPose.getY() - pastRobotPose.getY()) / dt,
-                robot.getHeadingVelocity()
-        );
-
-        lastUpdateTime = timer.seconds();
-        pastRobotPose = robotPose;
     }
 
 

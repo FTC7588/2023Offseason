@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.opmode.info;
 
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -81,6 +82,7 @@ Once you put all your sensor reads at the beginning of the control cycle, it's v
 the bulk-read AUTO mode to streamline your cycle timing.
 
 */
+@Disabled
 @TeleOp (name = "Motor Bulk Reads - Big", group = "Tests")
 public class ConceptMotorBulkReadBig extends LinearOpMode {
 

@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 
 public abstract class CommandOpModeEx extends CommandOpMode {
 
+    private boolean runOnce = false;
+
     public void initLoop() {}
 
     public void runInit() {}
@@ -16,9 +18,11 @@ public abstract class CommandOpModeEx extends CommandOpMode {
             initLoop();
         }
 
-        runInit();
-
         while (!isStopRequested() && opModeIsActive()) {
+            if (!runOnce) {
+                runInit();
+                runOnce = true;
+            }
             run();
         }
 

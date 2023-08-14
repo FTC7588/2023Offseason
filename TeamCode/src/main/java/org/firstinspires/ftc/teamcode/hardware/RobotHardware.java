@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCCommand;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCResponse;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -48,7 +48,10 @@ public class RobotHardware {
 
     public VoltageSensor batteryVoltageSensor;
 
+    private final Object imuLock = new Object();
+    @GuardedBy("imuLock")
     public IMU imu;
+    private Thread imuThread;
 
     private double rollOffset;
     private double pitchOffset;
@@ -78,6 +81,13 @@ public class RobotHardware {
         for (LynxModule hub : hubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+
+//        synchronized (imuLock) {
+            imu = hwMap.get(IMU.class, "imu");
+            IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+            imu.initialize(parameters);
+//        }
 
 
         //drive
@@ -133,10 +143,6 @@ public class RobotHardware {
 
         intake.setInverted(true);
 
-        imu = hwMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
-        imu.initialize(parameters);
 
         angles = new EulerAngles(
                 imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS),
@@ -153,10 +159,11 @@ public class RobotHardware {
     public void read(Subsystems subsystems) {
         //calculateControlServoBusCurrent();
         //calculateExpansionServoBusCurrent();
+
+        //headingVelocity = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
         angles.roll = imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS);
         angles.pitch = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
         angles.yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        //headingVelocity = imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
 
         subsystems.getDrive().read();
         subsystems.getEle().read();
@@ -207,6 +214,19 @@ public class RobotHardware {
         }
     }
 
+//    public void startIMUThread(LinearOpMode opMode) {
+//        imuThread = new Thread(() -> {
+//            while (!opMode.isStopRequested() && opMode.opModeIsActive()) {
+//                synchronized (imuLock) {
+//                    angles.roll = imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS);
+//                    angles.pitch = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
+//                    angles.yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//                }
+//            }
+//        });
+//        imuThread.start();
+//    }
+
     public HardwareMap getHwMap() {
         return hwMap;
     }
@@ -227,10 +247,15 @@ public class RobotHardware {
         return headingVelocity;
     }
 
+    public double getIMUTime() {
+        return imu.getRobotYawPitchRollAngles().getAcquisitionTime();
+    }
+
     public void resetIMU() {
-        rollOffset = imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS);
-        pitchOffset = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
-        headingOffset = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        rollOffset = angles.roll;
+        pitchOffset = angles.pitch;
+        headingOffset = angles.yaw;
+
     }
 
     public EulerAngles getRobotAngles() {

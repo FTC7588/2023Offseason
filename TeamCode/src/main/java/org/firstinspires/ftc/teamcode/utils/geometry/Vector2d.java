@@ -10,6 +10,11 @@ public class Vector2d {
         this.y = y;
     }
 
+    public Vector2d() {
+        this.x = 0;
+        this.y = 0;
+    }
+
     public Vector2d add(Vector2d vector2d) {
         double xSum = this.x + vector2d.getX();
         double ySum = this.y + vector2d.getY();
@@ -20,6 +25,10 @@ public class Vector2d {
         double xDifference = this.x - vector2d.getX();
         double yDifference = this.y - vector2d.getY();
         return new Vector2d(xDifference, yDifference);
+    }
+
+    public Vector2d unaryMinus() {
+        return new Vector2d(-x, -y);
     }
 
     public double dotProduct(Vector2d vector2d) {

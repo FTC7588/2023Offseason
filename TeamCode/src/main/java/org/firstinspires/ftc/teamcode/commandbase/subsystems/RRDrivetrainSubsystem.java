@@ -10,7 +10,6 @@ import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.kinematics.MecanumKinematics;
-import com.acmerobotics.roadrunner.localization.Localizer;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
@@ -28,7 +27,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceRunner;
 import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
-import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizerSingle;
+import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizer3dSingle;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.MAX_ACCEL;
@@ -51,7 +50,7 @@ public class RRDrivetrainSubsystem extends SubsystemBase {
     private DriveMode mode;
 
 
-    public final AprilTagLocalizerSingle localizer;
+    public final AprilTagLocalizer3dSingle localizer;
     private final TrajectoryFollower follower;
     private final TrajectorySequenceRunner trajectorySequenceRunner;
 
@@ -72,7 +71,7 @@ public class RRDrivetrainSubsystem extends SubsystemBase {
                 DRIVE_MAX_TURN_SPEED_PID
         );
 
-        localizer = new AprilTagLocalizerSingle(this.robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
+        localizer = new AprilTagLocalizer3dSingle(this.robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);

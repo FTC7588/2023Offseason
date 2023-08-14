@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.TagTrajectory;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
 import org.firstinspires.ftc.teamcode.utils.gamepads.GamepadTrigger;
 import org.firstinspires.ftc.teamcode.utils.gamepads.TriggerGamepadEx;
 
+@Disabled
 @TeleOp
 public class Experiment extends CommandOpModeEx {
 

@@ -1,30 +1,36 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
+import static org.firstinspires.ftc.teamcode.hardware.Constants.ARM_ANGLE_BACK;
+import static org.firstinspires.ftc.teamcode.hardware.Constants.ARM_ANGLE_FRONT;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.commandbase.commands.arm.SetArmAngle;
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.FieldCentricPID;
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.FollowTag;
-import org.firstinspires.ftc.teamcode.commandbase.commands.elevator.MoveElevatorToPosition;
 import org.firstinspires.ftc.teamcode.commandbase.commands.drive.RobotCentricPID;
+import org.firstinspires.ftc.teamcode.commandbase.commands.elevator.MoveElevatorToPosition;
 import org.firstinspires.ftc.teamcode.commandbase.commands.intake.SetIntakePower;
 import org.firstinspires.ftc.teamcode.commandbase.commands.rotator.SetRotatorPosition;
 import org.firstinspires.ftc.teamcode.opmode.BaseOpMode;
-
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
-import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
-
-import android.annotation.SuppressLint;
-
-import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
-import org.firstinspires.ftc.teamcode.utils.PoofyDashboardUtil;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import javax.annotation.concurrent.GuardedBy;
 
 @TeleOp
-public class Basic extends BaseOpMode {
+public class IMUTest extends BaseOpMode {
 
     private RobotCentricPID robotCentricPID;
     private FieldCentricPID fieldCentricPID;
@@ -45,8 +51,10 @@ public class Basic extends BaseOpMode {
 
     private boolean runOnce = true;
 
-    FtcDashboard dashboard = FtcDashboard.getInstance();
-
+    private final Object imuLock = new Object();
+    @GuardedBy("imuLock")
+    public IMU imu;
+    private Thread imuThread;
 
     protected Pose2d followPose = new Pose2d(5, -30, 0);
 
@@ -54,9 +62,7 @@ public class Basic extends BaseOpMode {
     public void initialize() {
         super.initialize();
 
-        dashboard.setTelemetryTransmissionInterval(100);
-
-        robot.resetIMU();
+        //robot.resetIMU();
 
         //drive commands
         robotCentricPID = new RobotCentricPID(
@@ -118,6 +124,13 @@ public class Basic extends BaseOpMode {
         //gp1(A, 3).whenActive(robot::resetIMU);
 
 
+        synchronized (imuLock) {
+            imu = hardwareMap.get(IMU.class, "imu");
+            IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                    RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
+            imu.initialize(parameters);
+        }
+
         //init commands
         //robotCentricPID.schedule();
         rotForward.schedule();
@@ -126,12 +139,11 @@ public class Basic extends BaseOpMode {
         tau();
     }
 
-    @SuppressLint("DefaultLocale")
     @Override
     public void run() {
         super.run();
         if (runOnce) {
-            //robot.startIMUThread(this);
+            startIMUThread(this);
             runOnce = false;
         }
         robot.read(subsystems);
@@ -146,45 +158,33 @@ public class Basic extends BaseOpMode {
 //            tad("y", driveSS.getCamPose().getY());
 //            tad("z", driveSS.getCamPose().getZ());
 //            tal();
-
-//            tal(String.format("camPose XYZ %6.1f, %6.1f, %6.1f", driveSS.getCamPose().getX(), driveSS.getCamPose().getY(), driveSS.getCamPose().getZ()));
-//            tal(String.format("camPose RPY %6.1f, %6.1f, %6.1f", Math.toDegrees(driveSS.getCamPose().getRotation().getX()),  Math.toDegrees(driveSS.getCamPose().getRotation().getY()),  Math.toDegrees(driveSS.getCamPose().getRotation().getZ())));
-//
+//            tad("filtered roll", Math.toDegrees(driveSS.getCamPose().getRotation().getX()));
+//            tad("filtered pitch", Math.toDegrees(driveSS.getCamPose().getRotation().getY()));
+//            tad("filtered yaw", Math.toDegrees(driveSS.getCamPose().getRotation().getZ()));
 //            tal();
-//
-//            tal(String.format("camToTag XYZ %6.1f, %6.1f, %6.1f", driveSS.getCamToTag().getX(), driveSS.getCamToTag().getY(), driveSS.getCamToTag().getZ()));
-//            tal(String.format("camToTag RPY %6.1f, %6.1f, %6.1f", Math.toDegrees(driveSS.getCamToTag().getRotation().getX()),  Math.toDegrees(driveSS.getCamToTag().getRotation().getY()),  Math.toDegrees(driveSS.getCamToTag().getRotation().getZ())));
-
-            tal(String.format("tag pose XY T %6.1f, %6.1f, %8.1f", driveSS.getTagPose().getVector().getX(), driveSS.getTagPose().getVector().getY(), Math.toDegrees(driveSS.getTagPose().getTheta())));
-
-            tal(String.format("camToTag XY T %6.1f, %6.1f, %8.1f", driveSS.getCamToTag().getVector().getX(), driveSS.getCamToTag().getVector().getY(), Math.toDegrees(driveSS.getCamToTag().getRotation())));
-
-            tal(String.format("cam pose XY T %6.1f, %6.1f, %8.1f", driveSS.getCamPose().getVector().getX(), driveSS.getCamPose().getVector().getY(), Math.toDegrees(driveSS.getCamPose().getTheta())));
-
-            tal();
-
-            //tad("tag yaw", driveSS.getTagPose().getRotation().getZ());
-
-            tal();
         }
 
         tad("roll", Math.toDegrees(robot.getRoll()));
         tad("pitch", Math.toDegrees(robot.getPitch()));
         tad("heading", Math.toDegrees(robot.getHeading()));
 
-        //tad("drive mode", driveSS.getMode());
+        tad("drive mode", driveSS.getMode());
         tal();
         tau();
 
-
-        TelemetryPacket packet = new TelemetryPacket();
-
-        PoofyDashboardUtil.drawTags(packet.fieldOverlay(), AprilTagCustomDatabase.getSmallLibrary());
-        PoofyDashboardUtil.drawRobotPose(packet.fieldOverlay(), driveSS.getRobotPose());
-
-        dashboard.sendTelemetryPacket(packet);
-
-
         robot.clearBulkCache();
+    }
+
+    public void startIMUThread(LinearOpMode opMode) {
+        imuThread = new Thread(() -> {
+            while (!opMode.isStopRequested() && opMode.opModeIsActive()) {
+                synchronized (imuLock) {
+                    double roll = imu.getRobotYawPitchRollAngles().getRoll(AngleUnit.RADIANS);
+                    double pitch = imu.getRobotYawPitchRollAngles().getPitch(AngleUnit.RADIANS);
+                    double yaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                }
+            }
+        });
+        imuThread.start();
     }
 }
