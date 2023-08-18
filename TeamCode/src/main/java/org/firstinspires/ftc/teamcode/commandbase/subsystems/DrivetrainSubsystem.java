@@ -6,10 +6,18 @@ import org.firstinspires.ftc.teamcode.enums.DriveMode;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Transform2d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Vector3d;
+import org.firstinspires.ftc.teamcode.utils.hardware.CameraConfig;
 import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizer2dSingle;
+import org.firstinspires.ftc.teamcode.utils.localizers.butgood.AprilTagLocalizer2d;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
+
+import android.util.Size;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
@@ -24,7 +32,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
 
 
-    private final AprilTagLocalizer2dSingle tagLocalizer;
+    private final AprilTagLocalizer2d tagLocalizer;
 
     public DrivetrainSubsystem(RobotHardware robot) {
         this.robot = robot;
@@ -40,7 +48,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 DRIVE_MAX_TURN_SPEED_PID
         );
 
-        tagLocalizer = new AprilTagLocalizer2dSingle(robot, CAMERA_POSE.toPose2d(), C920_INTRINSICS, VISION_AVG);
+        //tagLocalizer = new AprilTagLocalizer2dSingle(robot, CAMERA_POSE.toPose2d(), C920_INTRINSICS, VISION_AVG);
+
+        tagLocalizer = new AprilTagLocalizer2d(new CameraConfig(
+                robot.camera,
+                new Pose3d(new Vector3d(0, 0, 0), new Rotation3d(0, 0, 0)),
+                C920_INTRINSICS,
+                15,
+                255,
+                new Size(620, 480),
+                VisionPortal.StreamFormat.MJPEG
+        ));
 
         robotPose = new Pose2d(0, 0, 0);
     }
@@ -53,9 +71,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void loop() {
         heading = robot.getHeading();
         tagLocalizer.update();
-        if (tagLocalizer.isDetected()) {
-            robotPose = tagLocalizer.getCamPose();
-        }
+//        if (tagLocalizer.isDetected()) {
+            robotPose = tagLocalizer.getPoseEstimate();
+//        }
     }
 
     public void write() {
@@ -67,17 +85,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
 
-    public Pose2d getTagPose() {
-        return tagLocalizer.getTagPose();
-    }
-
-    public Pose2d getCamPose() {
-        return tagLocalizer.getCamPose();
-    }
-
-    public Transform2d getCamToTag() {
-        return tagLocalizer.getCamToTag();
-    }
+//    public Pose2d getTagPose() {
+//        return tagLocalizer.getTagPose();
+//    }
+//
+//    public Pose2d getCamPose() {
+//        return tagLocalizer.getCamPose();
+//    }
+//
+//    public Transform2d getCamToTag() {
+//        return tagLocalizer.getCamToTag();
+//    }
 
 
     public void robotCentricMode(double strafeSpeed, double forwardSpeed, double turnSpeed, boolean pidTurning) {
@@ -117,26 +135,26 @@ public class DrivetrainSubsystem extends SubsystemBase {
         mode = DriveMode.FIELD_CENTRIC;
     }
 
-    public void followTagMode(Pose2d followPose) {
-        if (isDetected()) {
-            drive.driveFollowTag(
-                    new Pose2d(
-                            getCamPose().getX(),
-                            getCamPose().getY(),
-                            Math.toDegrees(getCamPose().getTheta())
-                    ),
-                    followPose
-            );
-        } else {
-            drive.driveRobotCentric(0, 0, 0);
-        }
-
-        mode = DriveMode.FOLLOW_TAG;
-    }
-
-    public boolean isDetected() {
-        return tagLocalizer.isDetected();
-    }
+//    public void followTagMode(Pose2d followPose) {
+//        if (isDetected()) {
+//            drive.driveFollowTag(
+//                    new Pose2d(
+//                            getCamPose().getX(),
+//                            getCamPose().getY(),
+//                            Math.toDegrees(getCamPose().getTheta())
+//                    ),
+//                    followPose
+//            );
+//        } else {
+//            drive.driveRobotCentric(0, 0, 0);
+//        }
+//
+//        mode = DriveMode.FOLLOW_TAG;
+//    }
+//
+//    public boolean isDetected() {
+//        return tagLocalizer.isDetected();
+//    }
 
     public DriveMode getMode() {
         return mode;
