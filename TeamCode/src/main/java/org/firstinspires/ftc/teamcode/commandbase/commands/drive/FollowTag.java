@@ -20,7 +20,7 @@ public class FollowTag extends CommandBase {
 
     @Override
     public void execute() {
-        m_drivetrainSubsystem.followTagMode(followPose);
+        //m_drivetrainSubsystem.followTagMode(followPose);
     }
 
 }

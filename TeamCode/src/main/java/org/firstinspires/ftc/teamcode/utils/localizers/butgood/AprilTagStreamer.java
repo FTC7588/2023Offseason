@@ -25,7 +25,7 @@ public class AprilTagStreamer {
 
     private ArrayList<AprilTagDetection> tags;
 
-    public AprilTagStreamer(CameraConfig config) {
+    public AprilTagStreamer(CameraConfig config, AprilTagLibrary library) {
 
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
@@ -38,6 +38,7 @@ public class AprilTagStreamer {
                         config.getIntrinsics().getCx(),
                         config.getIntrinsics().getCy()
                 )
+                .setTagLibrary(library)
                 .build();
 
         visionPortal = new VisionPortal.Builder()
@@ -48,6 +49,8 @@ public class AprilTagStreamer {
                 .enableCameraMonitoring(true)
                 .setAutoStopLiveView(true)
                 .build();
+
+        while (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {}
 
         ExposureControl exposure = visionPortal.getCameraControl(ExposureControl.class);
         GainControl gain = visionPortal.getCameraControl(GainControl.class);

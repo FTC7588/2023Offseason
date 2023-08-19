@@ -56,7 +56,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 C920_INTRINSICS,
                 15,
                 255,
-                new Size(620, 480),
+                new Size(640, 480),
                 VisionPortal.StreamFormat.MJPEG
         ));
 

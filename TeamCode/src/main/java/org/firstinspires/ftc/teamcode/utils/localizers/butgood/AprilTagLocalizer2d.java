@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.utils.localizers.butgood;
 
+import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
 import org.firstinspires.ftc.teamcode.utils.MathUtil;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
@@ -15,8 +16,8 @@ import java.util.ArrayList;
 public class AprilTagLocalizer2d implements Localizer {
 
     protected ArrayList<AprilTagDetection> tags;
-    protected ArrayList<AprilTagStreamer> streamers;
-    protected ArrayList<Pose3d> camPoses;
+    protected ArrayList<AprilTagStreamer> streamers = new ArrayList<>();
+    protected ArrayList<Pose3d> camPoses = new ArrayList<>();
     protected ArrayList<Pose2d> camPoseEstimates;
 
     protected Pose2d camPose;
@@ -31,7 +32,7 @@ public class AprilTagLocalizer2d implements Localizer {
 
     public AprilTagLocalizer2d(CameraConfig... configs) {
         for (CameraConfig config : configs) {
-            streamers.add(new AprilTagStreamer(config));
+            streamers.add(new AprilTagStreamer(config, AprilTagCustomDatabase.getSmallLibrary()));
             camPoses.add(config.getCamPose());
         }
     }
@@ -55,7 +56,7 @@ public class AprilTagLocalizer2d implements Localizer {
         }
     }
 
-    protected Pose2d getCamToTagPose2d(AprilTagDetection detection) {
+    protected Pose2d getCamToRobotPose2d(AprilTagDetection detection, Pose2d camPose) {
         Pose2d tagPose = new Pose2d(
                 detection.metadata.fieldPosition.get(0),
                 detection.metadata.fieldPosition.get(1),
@@ -83,17 +84,18 @@ public class AprilTagLocalizer2d implements Localizer {
 //    }
 
     protected Pose2d lowestDecisionMarginStrategy2d(ArrayList<AprilTagDetection> detections) {
-        double lowestMargin = 10;
 
+        double lowestMargin = 10000;
+        int camera;
         AprilTagDetection lowestMarginTag = null;
 
-        for (AprilTagDetection detection : detections) {
-            if (detection.decisionMargin < lowestMargin) {
-                lowestMargin = detection.decisionMargin;
-                lowestMarginTag = detection;
+        for (int i = 0; i < detections.size(); i++) {
+            if (detections.get(i).decisionMargin < lowestMargin) {
+                lowestMargin = detections.get(i).decisionMargin;
+                lowestMarginTag = detections.get(i);
             }
         }
 
-        return lowestMarginTag != null ? getCamToTagPose2d(lowestMarginTag) : new Pose2d(0, 0, 0);
+        return getCamToRobotPose2d(lowestMarginTag);
     }
 }
