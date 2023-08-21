@@ -67,6 +67,10 @@ public class Pose2d {
         return new Pose2d(transform2d.getVector(), transform2d.getRotation());
     }
 
+    public Transform2d toTransform2d() {
+        return new Transform2d(x, y, theta);
+    }
+
     @SuppressLint("DefaultLocale")
     public String toString() {
         return String.format("(%.3f, %.3f, %.3f°)", x, y, Math.toDegrees(theta));

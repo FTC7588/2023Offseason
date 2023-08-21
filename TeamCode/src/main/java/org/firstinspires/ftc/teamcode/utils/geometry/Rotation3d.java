@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.utils.MathUtil;
 
 public class Rotation3d {
-    private Quaternion q = new Quaternion();
+    public Quaternion q = new Quaternion();
 
     public Rotation3d() {}
 

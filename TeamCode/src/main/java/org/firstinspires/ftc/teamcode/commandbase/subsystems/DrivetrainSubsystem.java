@@ -52,7 +52,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         tagLocalizer = new AprilTagLocalizer2d(new CameraConfig(
                 robot.camera,
-                new Pose3d(new Vector3d(0, 0, 0), new Rotation3d(0, 0, 0)),
+                CAMERA_POSE,
                 C920_INTRINSICS,
                 15,
                 255,

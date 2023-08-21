@@ -19,7 +19,7 @@ public class AprilTagLocalizer3d extends AprilTagLocalizer2d {
     public void update() {
         super.update();
 
-        detected = tags.size() > 0;
+        //detected = tags.size() > 0;
 
 
     }

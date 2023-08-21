@@ -5,9 +5,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 
 public class Vector3d {
 
-    private final double x;
-    private final double y;
-    private final double z;
+    public double x;
+    public double y;
+    public double z;
 
     public Vector3d() {
         this(0, 0, 0);

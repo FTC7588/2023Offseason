@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.utils.geometry;
 
 public class Pose3d {
 
-    private final Vector3d vector3d;
-    private final Rotation3d rotation3d;
+    public Vector3d vector3d;
+    public final Rotation3d rotation3d;
 
     public Pose3d() {
         vector3d = new Vector3d();
@@ -51,6 +51,14 @@ public class Pose3d {
 
     public Pose2d toPose2d() {
         return new Pose2d(vector3d.toVector2d(), rotation3d.getZ());
+    }
+
+    public Transform2d toTransform2d() {
+        return toPose2d().toTransform2d();
+    }
+
+    public Transform3d toTransform3d() {
+        return new Transform3d(vector3d, rotation3d);
     }
 
     public Vector3d getVector() {

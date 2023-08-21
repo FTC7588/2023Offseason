@@ -12,15 +12,16 @@ import org.firstinspires.ftc.teamcode.utils.hardware.CameraConfig;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AprilTagLocalizer2d implements Localizer {
 
-    protected ArrayList<AprilTagDetection> tags;
     protected ArrayList<AprilTagStreamer> streamers = new ArrayList<>();
-    protected ArrayList<Pose3d> camPoses = new ArrayList<>();
-    protected ArrayList<Pose2d> camPoseEstimates;
 
-    protected Pose2d camPose;
+    protected LinkedHashMap<AprilTagDetection, Pose3d> tagsWithCamPoses;
+
+    protected Pose2d robotPose;
 
     protected Transform2d coordinateFix2d = new Transform2d(0, 0, Math.toRadians(90));
     protected Transform3d coordinateFix3d = new Transform3d(
@@ -33,30 +34,29 @@ public class AprilTagLocalizer2d implements Localizer {
     public AprilTagLocalizer2d(CameraConfig... configs) {
         for (CameraConfig config : configs) {
             streamers.add(new AprilTagStreamer(config, AprilTagCustomDatabase.getSmallLibrary()));
-            camPoses.add(config.getCamPose());
         }
     }
 
     @Override
     public void update() {
         consolidateLists();
-        camPose = lowestDecisionMarginStrategy2d(tags);
-    }
-
-    public Pose2d getPoseEstimate() {
-        return camPose;
+        robotPose = lowestDecisionMarginStrategy2d(tagsWithCamPoses);
     }
 
 
     protected void consolidateLists() {
-        tags = new ArrayList<>();
-        for (AprilTagStreamer streamer : streamers) {
-            streamer.update();
-            tags.addAll(streamer.getTags());
+
+        tagsWithCamPoses = new LinkedHashMap<>();
+        for (int i = 0; i < streamers.size(); i++) {
+            streamers.get(i).update();
+            for (int j = 0; j < streamers.get(i).getTags().size(); j++) {
+                //tags.add(MathUtil.tagTransformCamToRobot(streamers.get(i).getTags().get(j), streamers.get(i).getCamToRobot()));
+                tagsWithCamPoses.put(streamers.get(i).getTags().get(j), streamers.get(i).getCamToRobot());
+            }
         }
     }
 
-    protected Pose2d getCamToRobotPose2d(AprilTagDetection detection, Pose2d camPose) {
+    protected Pose2d getRobotToTagPose2d(AprilTagDetection detection, Pose3d robotToCam) {
         Pose2d tagPose = new Pose2d(
                 detection.metadata.fieldPosition.get(0),
                 detection.metadata.fieldPosition.get(1),
@@ -69,33 +69,30 @@ public class AprilTagLocalizer2d implements Localizer {
                 Math.toRadians(detection.ftcPose.yaw)
         );
 
-        return tagPose.transformBy(camToTag.inverse()).transformBy(coordinateFix2d);
+        Pose2d cameraPose = tagPose.transformBy(camToTag.inverse()).transformBy(coordinateFix2d);
+
+        return cameraPose.transformBy(robotToCam.toTransform2d().inverse());
     }
 
+    protected Pose2d lowestDecisionMarginStrategy2d(LinkedHashMap<AprilTagDetection, Pose3d> detections) {
 
-//    protected ArrayList<Pose2d> getCamToTagPoses2d(ArrayList<AprilTagDetection> detections) {
-//        ArrayList<Pose2d> poses = new ArrayList<>();
-//
-//        for (AprilTagDetection detection : detections) {
-//            poses.add(getCamToTagPose2d(detection));
-//        }
-//
-//        return poses;
-//    }
-
-    protected Pose2d lowestDecisionMarginStrategy2d(ArrayList<AprilTagDetection> detections) {
-
-        double lowestMargin = 10000;
-        int camera;
+        double lowestMargin = 10000000;
         AprilTagDetection lowestMarginTag = null;
+        Pose3d lowestMarginCamPose = null;
 
-        for (int i = 0; i < detections.size(); i++) {
-            if (detections.get(i).decisionMargin < lowestMargin) {
-                lowestMargin = detections.get(i).decisionMargin;
-                lowestMarginTag = detections.get(i);
+        for (Map.Entry<AprilTagDetection, Pose3d> entry : detections.entrySet()) {
+            if (entry.getKey().decisionMargin < lowestMargin) {
+                lowestMargin = entry.getKey().decisionMargin;
+                lowestMarginTag = entry.getKey();
+                lowestMarginCamPose = entry.getValue();
             }
         }
 
-        return getCamToRobotPose2d(lowestMarginTag);
+        assert lowestMarginTag != null;
+        return getRobotToTagPose2d(lowestMarginTag, lowestMarginCamPose);
+    }
+
+    public Pose2d getPoseEstimate() {
+        return robotPose;
     }
 }

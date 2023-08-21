@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
 import org.firstinspires.ftc.teamcode.utils.CameraIntrinsics;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
 import org.firstinspires.ftc.teamcode.utils.hardware.CameraConfig;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -25,7 +26,10 @@ public class AprilTagStreamer {
 
     private ArrayList<AprilTagDetection> tags;
 
+    private Pose3d camToRobot;
+
     public AprilTagStreamer(CameraConfig config, AprilTagLibrary library) {
+        this.camToRobot = config.getCamPose();
 
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
@@ -71,4 +75,7 @@ public class AprilTagStreamer {
         return tags;
     }
 
+    public Pose3d getCamToRobot() {
+        return camToRobot;
+    }
 }

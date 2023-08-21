@@ -2,6 +2,11 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.teamcode.utils.geometry.EulerAngles;
+import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Transform3d;
+import org.firstinspires.ftc.teamcode.utils.geometry.Vector3d;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 public class MathUtil {
 
