@@ -18,10 +18,11 @@ import java.util.Map;
 public class AprilTagLocalizer2d implements Localizer {
 
     protected ArrayList<AprilTagStreamer> streamers = new ArrayList<>();
+    protected ArrayList<AprilTagDetection> usedTags = new ArrayList<>();
 
     protected LinkedHashMap<AprilTagDetection, Pose3d> tagsWithCamPoses;
 
-    protected Pose2d robotPose;
+    protected Pose2d robotPose = new Pose2d();
 
     protected Transform2d coordinateFix2d = new Transform2d(0, 0, Math.toRadians(90));
     protected Transform3d coordinateFix3d = new Transform3d(
@@ -29,7 +30,7 @@ public class AprilTagLocalizer2d implements Localizer {
             new Rotation3d(0, 0, Math.toRadians(90))
     );
 
-    protected boolean detected = false;
+    protected boolean newDetection = false;
 
     public AprilTagLocalizer2d(CameraConfig... configs) {
         for (CameraConfig config : configs) {
@@ -40,7 +41,9 @@ public class AprilTagLocalizer2d implements Localizer {
     @Override
     public void update() {
         consolidateLists();
-        robotPose = lowestDecisionMarginStrategy2d(tagsWithCamPoses);
+        if (newDetection) {
+            robotPose = highestDecisionMarginStrategy2d(tagsWithCamPoses);
+        }
     }
 
 
@@ -54,9 +57,10 @@ public class AprilTagLocalizer2d implements Localizer {
                 tagsWithCamPoses.put(streamers.get(i).getTags().get(j), streamers.get(i).getCamToRobot());
             }
         }
+        newDetection = !tagsWithCamPoses.isEmpty();
     }
 
-    protected Pose2d getRobotToTagPose2d(AprilTagDetection detection, Pose3d robotToCam) {
+    protected Pose2d calculateRobotToCamPose2d(AprilTagDetection detection) {
         Pose2d tagPose = new Pose2d(
                 detection.metadata.fieldPosition.get(0),
                 detection.metadata.fieldPosition.get(1),
@@ -69,30 +73,56 @@ public class AprilTagLocalizer2d implements Localizer {
                 Math.toRadians(detection.ftcPose.yaw)
         );
 
-        Pose2d cameraPose = tagPose.transformBy(camToTag.inverse()).transformBy(coordinateFix2d);
-
-        return cameraPose.transformBy(robotToCam.toTransform2d().inverse());
+        return tagPose.transformBy(camToTag.inverse()).transformBy(coordinateFix2d);
     }
 
-    protected Pose2d lowestDecisionMarginStrategy2d(LinkedHashMap<AprilTagDetection, Pose3d> detections) {
+    protected Pose2d calculateRobotToTagPose2d(AprilTagDetection detection, Pose3d robotToCam) {
+        Pose2d cameraPose = calculateRobotToCamPose2d(detection);
 
-        double lowestMargin = 10000000;
-        AprilTagDetection lowestMarginTag = null;
-        Pose3d lowestMarginCamPose = null;
+        Pose2d robotPose = cameraPose.transformBy(robotToCam.toTransform2d().inverse());
+        robotPose.theta = MathUtil.angleWrap(robotPose.theta);
+
+        return robotPose;
+    }
+
+
+    protected Pose2d highestDecisionMarginStrategy2d(LinkedHashMap<AprilTagDetection, Pose3d> detections) {
+        usedTags = new ArrayList<>();
+        double highestMargin = -1;
+        AprilTagDetection highestMarginTag = null;
+        Pose3d highestMarginCamPose = null;
 
         for (Map.Entry<AprilTagDetection, Pose3d> entry : detections.entrySet()) {
-            if (entry.getKey().decisionMargin < lowestMargin) {
-                lowestMargin = entry.getKey().decisionMargin;
-                lowestMarginTag = entry.getKey();
-                lowestMarginCamPose = entry.getValue();
+            if (entry.getKey().decisionMargin > highestMargin || highestMargin == -1) {
+                highestMargin = entry.getKey().decisionMargin;
+                highestMarginTag = entry.getKey();
+                highestMarginCamPose = entry.getValue();
             }
         }
 
-        assert lowestMarginTag != null;
-        return getRobotToTagPose2d(lowestMarginTag, lowestMarginCamPose);
+        usedTags.add(highestMarginTag);
+
+        return calculateRobotToTagPose2d(highestMarginTag, highestMarginCamPose);
     }
+
+//    protected Pose2d averageBestTargetsStrategy(LinkedHashMap<AprilTagDetection, Pose3d> detections) {
+//        double totalNumber = 0;
+//
+//        for (Map.Entry<AprilTagDetection, Pose3d> entry : detections.entrySet()) {
+//
+//        }
+//    }
 
     public Pose2d getPoseEstimate() {
         return robotPose;
     }
+
+    public boolean hasNewDetection() {
+        return newDetection;
+    }
+
+    public ArrayList<AprilTagDetection> getUsedTags() {
+        return usedTags;
+    }
+
 }

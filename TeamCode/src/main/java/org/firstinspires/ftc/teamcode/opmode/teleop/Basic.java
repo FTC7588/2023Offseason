@@ -23,6 +23,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.util.Arrays;
+
 @TeleOp
 public class Basic extends BaseOpMode {
 
@@ -34,6 +36,7 @@ public class Basic extends BaseOpMode {
     private MoveElevatorToPosition eleDown;
 
     private SetArmAngle armForward;
+    private SetArmAngle armIdle;
     private SetArmAngle armBack;
 
     private SetRotatorPosition rotForward;
@@ -81,6 +84,7 @@ public class Basic extends BaseOpMode {
 
         //arm commands
         armBack = new SetArmAngle(armSS, ARM_ANGLE_BACK);
+        armIdle = new SetArmAngle(armSS, ARM_ANGLE_IDLE);
         armForward = new SetArmAngle(armSS, ARM_ANGLE_FRONT);
 
         //rotator commands
@@ -170,7 +174,7 @@ public class Basic extends BaseOpMode {
 
         tal(String.format("tag pose XY T %6.1f, %6.1f, %8.1f", driveSS.getRobotPose().getVector().getX(), driveSS.getRobotPose().getVector().getY(), Math.toDegrees(driveSS.getRobotPose().getTheta())));
 
-
+        tal(String.format("Decision Error: %s", Arrays.toString(driveSS.getTag().corners)));
 
         tad("roll", Math.toDegrees(robot.getRoll()));
         tad("pitch", Math.toDegrees(robot.getPitch()));

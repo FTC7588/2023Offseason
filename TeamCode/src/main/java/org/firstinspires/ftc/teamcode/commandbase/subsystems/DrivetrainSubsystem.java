@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.utils.hardware.CameraConfig;
 import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizer2dSingle;
 import org.firstinspires.ftc.teamcode.utils.localizers.butgood.AprilTagLocalizer2d;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
@@ -84,6 +85,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return robotPose;
     }
 
+    public AprilTagDetection getTag() {
+        return tagLocalizer.getUsedTags().get(0);
+    }
 
 //    public Pose2d getTagPose() {
 //        return tagLocalizer.getTagPose();

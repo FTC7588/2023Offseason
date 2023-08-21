@@ -7,6 +7,10 @@ public class Pose2d {
     public double y;
     public double theta;
 
+    public Pose2d() {
+        x = y = theta = 0;
+    }
+
     public Pose2d (double x, double y, double theta) {
         this.x = x;
         this.y = y;
