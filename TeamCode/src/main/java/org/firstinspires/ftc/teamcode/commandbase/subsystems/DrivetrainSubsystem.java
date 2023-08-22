@@ -93,9 +93,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
 //        return tagLocalizer.getTagPose();
 //    }
 //
-//    public Pose2d getCamPose() {
-//        return tagLocalizer.getCamPose();
-//    }
+    public Pose2d getCamPose() {
+        AprilTagDetection detection = tagLocalizer.getUsedTags().get(0);
+        Pose2d cam = new Pose2d(detection.ftcPose.x, detection.ftcPose.y, Math.toRadians(detection.ftcPose.yaw));
+        return cam;
+    }
 //
 //    public Transform2d getCamToTag() {
 //        return tagLocalizer.getCamToTag();
@@ -139,23 +141,23 @@ public class DrivetrainSubsystem extends SubsystemBase {
         mode = DriveMode.FIELD_CENTRIC;
     }
 
-//    public void followTagMode(Pose2d followPose) {
-//        if (isDetected()) {
-//            drive.driveFollowTag(
-//                    new Pose2d(
-//                            getCamPose().getX(),
-//                            getCamPose().getY(),
-//                            Math.toDegrees(getCamPose().getTheta())
-//                    ),
-//                    followPose
-//            );
-//        } else {
-//            drive.driveRobotCentric(0, 0, 0);
-//        }
-//
-//        mode = DriveMode.FOLLOW_TAG;
-//    }
-//
+    public void followTagMode(Pose2d followPose) {
+        if (tagLocalizer.hasNewDetection()) {
+            drive.driveFollowTag(
+                    new Pose2d(
+                            getCamPose().getX(),
+                            getCamPose().getY(),
+                            Math.toDegrees(getCamPose().getTheta())
+                    ),
+                    followPose
+            );
+        } else {
+            drive.driveRobotCentric(0, 0, 0);
+        }
+
+        mode = DriveMode.FOLLOW_TAG;
+    }
+
 //    public boolean isDetected() {
 //        return tagLocalizer.isDetected();
 //    }

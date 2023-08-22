@@ -44,7 +44,7 @@ public class Constants {
     public static double ARM_MAX_ACCEL = 2000;
 
     public static double ARM_ANGLE_BACK = -110;
-    public static double ARM_ANGLE_IDLE = 42.5;
+    public static double ARM_ANGLE_IDLE = 47.5;
     public static double ARM_ANGLE_STACK = 32.5;
     public static double ARM_ANGLE_FRONT = 110;
     public static double ARM_ANGLE_MAX = 130;

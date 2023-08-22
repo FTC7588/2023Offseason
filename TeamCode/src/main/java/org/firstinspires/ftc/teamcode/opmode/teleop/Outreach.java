@@ -67,7 +67,7 @@ public class Outreach extends BaseOpMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
 
-    protected Pose2d followPose = new Pose2d(5, -30, 0);
+    protected Pose2d followPose = new Pose2d(0, 30, 0);
 
     @Override
     public void initialize() {
@@ -223,14 +223,15 @@ public class Outreach extends BaseOpMode {
 
 //        tal(String.format("tag pose XY T %6.1f, %6.1f, %8.1f", driveSS.getRobotPose().getVector().getX(), driveSS.getRobotPose().getVector().getY(), Math.toDegrees(driveSS.getRobotPose().getTheta())));
 //
+
 //        tal(String.format("Decision Error: %s", Arrays.toString(driveSS.getTag().corners)));
 //
 //        tad("roll", Math.toDegrees(robot.getRoll()));
 //        tad("pitch", Math.toDegrees(robot.getPitch()));
 //        tad("heading", Math.toDegrees(robot.getHeading()));
 
-        tad("ele target", eleSS.getEleSetPoint());
-        tad("ele pos", eleSS.getElePos());
+//        tad("ele target", eleSS.getEleSetPoint());
+//        tad("ele pos", eleSS.getElePos());
 
         //tad("drive mode", driveSS.getMode());
         tal();
