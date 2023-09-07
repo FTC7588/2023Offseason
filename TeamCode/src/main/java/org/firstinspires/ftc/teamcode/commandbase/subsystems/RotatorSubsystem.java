@@ -25,9 +25,9 @@ public class RotatorSubsystem extends SubsystemBase {
     }
 
     public void write() {
-        if (targetPosition != actualPosition) {
-            robot.rotator.setPosition(targetPosition);
-        }
+
+        robot.rotator.setPosition(targetPosition);
+
     }
 
 

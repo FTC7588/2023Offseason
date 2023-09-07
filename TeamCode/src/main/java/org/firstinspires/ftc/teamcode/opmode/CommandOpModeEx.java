@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.opmode;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 
+import org.firstinspires.ftc.vision.VisionPortal;
+
 public abstract class CommandOpModeEx extends CommandOpMode {
 
     private boolean runOnce = false;
@@ -9,6 +11,7 @@ public abstract class CommandOpModeEx extends CommandOpMode {
     public void initLoop() {}
 
     public void runInit() {}
+
 
     @Override
     public void runOpMode() throws InterruptedException {

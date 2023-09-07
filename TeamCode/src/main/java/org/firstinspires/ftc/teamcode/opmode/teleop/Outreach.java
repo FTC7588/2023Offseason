@@ -73,9 +73,9 @@ public class Outreach extends BaseOpMode {
     public void initialize() {
         super.initialize();
 
-        dashboard.setTelemetryTransmissionInterval(100);
+        //dashboard.setTelemetryTransmissionInterval(100);
 
-        robot.resetIMU();
+        //robot.resetIMU();
 
         //drive commands
         robotCentricPID = new RobotCentricPID(
@@ -99,7 +99,7 @@ public class Outreach extends BaseOpMode {
                 () -> driver.getRightX()
         );
 
-        followTag = new FollowTag(driveSS, followPose);
+        //followTag = new FollowTag(driveSS, followPose);
 
         //elevator commands
         eleUp = new MoveElevatorToPosition(eleSS, 12);
@@ -155,13 +155,13 @@ public class Outreach extends BaseOpMode {
         gp1(DPAD_LEFT, 1).whenActive(eleIdle);
         gp1(DPAD_DOWN, 1).whenActive(eleDown);
 
-        //arm controls
-        gp1(X, 1).whenActive(armBack);
-        gp1(A, 1).whenActive(armIdle);
-        gp1(B, 1).whenActive(armForward);
-
-        //rotator control
-        gp1(Y, 1).toggleWhenActive(rotBack, rotForward);
+//        //arm controls
+//        gp1(X, 1).whenActive(armBack);
+//        gp1(A, 1).whenActive(armIdle);
+//        gp1(B, 1).whenActive(armForward);
+//
+//        //rotator control
+//        gp1(Y, 1).toggleWhenActive(rotBack, rotForward);
 
         //intake controls
         gp1(LEFT_BUMPER, 1).whenActive(intakeOut).whenInactive(intakeIdle);
