@@ -22,6 +22,8 @@ public class MecanumDrive {
     private double turnSpeed;
     private double theta;
 
+    private double forwardMax, backMax, leftMax, rightMax;
+
     private Pose2d currentPose;
 
     public MecanumDrive(DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx backLeft, DcMotorEx backRight) {
@@ -33,6 +35,8 @@ public class MecanumDrive {
         yController = new PoofyPIDController.Builder().build();
         thetaController = new PoofyPIDController.Builder().build();
         currentPose = new Pose2d(0, 0, 0);
+
+        forwardMax = backMax = leftMax = rightMax = 1;
     }
 
     public MecanumDrive(DcMotorEx frontLeft,
@@ -59,7 +63,11 @@ public class MecanumDrive {
         this.maxTurnSpeedPID = maxTurnSpeedPID;
 
         currentPose = new Pose2d(0, 0, 0);
+
+        forwardMax = backMax = leftMax = rightMax = 1;
     }
+
+    
 
     public void setMaxSpeed(double maxOutput) {
         this.maxOutput = maxOutput;
@@ -101,6 +109,14 @@ public class MecanumDrive {
     ) {
         Vector2d input = new Vector2d(strafeSpeed, forwardSpeed);
         input = input.rotateBy(-gyroAngle);
+
+//        if (input.getX() >= 0) {
+//            input = new Vector2d(Math.min(input.getX(), rightMax), input.getY());
+//        }
+
+        input = input.getX() >= 0 ? new Vector2d(Math.min(input.getX(), rightMax), input.getY()) : new Vector2d(Math.max(input.getX(), leftMax), input.getY());
+
+        input = input.getY() >= 0 ? new Vector2d(input.getX(), Math.min(input.getY(), forwardMax)) : new Vector2d(input.getX(), Math.max(input.getY(), backMax));
 
         driveRobotCentric(
                 input.getX(),

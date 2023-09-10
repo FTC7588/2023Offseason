@@ -6,7 +6,6 @@ import com.qualcomm.hardware.lynx.LynxNackException;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCCommand;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetADCResponse;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -39,7 +38,8 @@ public class RobotHardware {
 
     public CRServo intake;
 
-    public CameraName camera;
+    public CameraName C930;
+    public CameraName C920;
 
     private List<LynxModule> hubs;
 
@@ -150,8 +150,8 @@ public class RobotHardware {
                 imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)
         );
 
-        camera = hwMap.get(WebcamName.class, "Webcam 1");
-
+        C930 = hwMap.get(WebcamName.class, "Webcam 1");
+        C920 = hwMap.get(WebcamName.class, "Webcam 2");
 
         batteryVoltageSensor = hwMap.voltageSensor.iterator().next();
     }

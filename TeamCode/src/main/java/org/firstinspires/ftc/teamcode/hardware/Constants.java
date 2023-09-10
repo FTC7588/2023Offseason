@@ -67,11 +67,18 @@ public class Constants {
 
 
     //vision
-    public static CameraIntrinsics C920_INTRINSICS = new CameraIntrinsics(504.041, 504.041, 307.462, 234.687);
-    public static Pose3d CAMERA_POSE = new Pose3d(
+    public static CameraIntrinsics C930_INTRINSICS = new CameraIntrinsics(504.041, 504.041, 307.462, 234.687);
+    public static Pose3d C930_POSE = new Pose3d(
             new Vector3d(5.63, -5, 14.1339),
             new Rotation3d(0, 0, Math.toRadians(-10))
     );
+
+    public static CameraIntrinsics C920_INTRINSICS = new CameraIntrinsics(504.041, 504.041, 307.462, 234.687);
+    public static Pose3d C920_POSE = new Pose3d(
+            new Vector3d(5.63, -5, 15.1339),
+            new Rotation3d(0, 0, Math.toRadians(-10))
+    );
+
     public static int VISION_AVG = 3;
 
 

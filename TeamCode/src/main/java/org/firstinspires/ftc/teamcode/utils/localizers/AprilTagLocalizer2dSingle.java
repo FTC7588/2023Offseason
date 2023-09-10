@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.utils.filters.MovingAverage;
 import org.firstinspires.ftc.teamcode.utils.filters.WeightedAverage;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.utils.geometry.Transform2d;
-import org.firstinspires.ftc.teamcode.utils.localizers.butgood.AprilTagStreamer;
 import org.firstinspires.ftc.teamcode.utils.localizers.butgood.Localizer;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -81,7 +80,7 @@ public class AprilTagLocalizer2dSingle implements Localizer {
 
         //initialize vision portal
         visionPortal = new VisionPortal.Builder()
-                .setCamera(robot.camera)
+                .setCamera(robot.C930)
                 .addProcessor(tagProcessor)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)

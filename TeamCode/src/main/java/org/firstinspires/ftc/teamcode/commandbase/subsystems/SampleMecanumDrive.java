@@ -135,7 +135,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        setLocalizer(new AprilTagLocalizer3dSingle(robot, Constants.CAMERA_POSE, Constants.C920_INTRINSICS, Constants.VISION_AVG));
+        setLocalizer(new AprilTagLocalizer3dSingle(robot, Constants.C930_POSE, Constants.C930_INTRINSICS, Constants.VISION_AVG));
 
         //setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
 

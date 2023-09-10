@@ -71,7 +71,7 @@ public class RRDrivetrainSubsystem extends SubsystemBase {
                 DRIVE_MAX_TURN_SPEED_PID
         );
 
-        localizer = new AprilTagLocalizer3dSingle(this.robot, CAMERA_POSE, C920_INTRINSICS, VISION_AVG);
+        localizer = new AprilTagLocalizer3dSingle(this.robot, C930_POSE, C930_INTRINSICS, VISION_AVG);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);

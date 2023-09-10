@@ -6,18 +6,16 @@ import org.firstinspires.ftc.teamcode.enums.DriveMode;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.utils.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.utils.geometry.Pose3d;
-import org.firstinspires.ftc.teamcode.utils.geometry.Rotation3d;
-import org.firstinspires.ftc.teamcode.utils.geometry.Transform2d;
-import org.firstinspires.ftc.teamcode.utils.geometry.Vector3d;
 import org.firstinspires.ftc.teamcode.utils.hardware.CameraConfig;
-import org.firstinspires.ftc.teamcode.utils.localizers.AprilTagLocalizer2dSingle;
 import org.firstinspires.ftc.teamcode.utils.localizers.butgood.AprilTagLocalizer2d;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import static org.firstinspires.ftc.teamcode.hardware.Constants.*;
 
 import android.util.Size;
+
+import java.util.ArrayList;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
@@ -52,9 +50,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         tagLocalizer = new AprilTagLocalizer2d(
                 new CameraConfig(
-                    robot.camera,
-                    CAMERA_POSE,
-                    C920_INTRINSICS,
+                    robot.C930,
+                        C930_POSE,
+                        C930_INTRINSICS,
                     15,
                     255,
                     new Size(640, 480),
@@ -73,9 +71,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     public void loop() {
         heading = robot.getHeading();
         tagLocalizer.update();
-//        if (tagLocalizer.isDetected()) {
-            robotPose = tagLocalizer.getPoseEstimate();
-//        }
+        robotPose = tagLocalizer.getPoseEstimate();
     }
 
     public void write() {
@@ -84,6 +80,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public Pose2d getRobotPose() {
         return robotPose;
+    }
+
+    public ArrayList<AprilTagDetection> getUsedTags() {
+        return tagLocalizer.getUsedTags();
     }
 
 

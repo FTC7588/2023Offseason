@@ -87,7 +87,7 @@ public class AprilTagLocalizer3dSingle implements Localizer {
                 .build();
 
         visionPortal = new VisionPortal.Builder()
-                .setCamera(robot.camera)
+                .setCamera(robot.C930)
                 .addProcessor(tagProcessor)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)

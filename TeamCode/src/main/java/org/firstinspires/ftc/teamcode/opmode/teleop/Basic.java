@@ -170,8 +170,10 @@ public class Basic extends BaseOpMode {
 //            tal();
 //        }
 
-        //tal(String.format("tag pose XY T %6.1f, %6.1f, %8.1f", driveSS.getRobotPose().getVector().getX(), driveSS.getRobotPose().getVector().getY(), Math.toDegrees(driveSS.getRobotPose().getTheta())));
+        tal(String.format("tag pose XY T %6.1f, %6.1f, %8.1f", driveSS.getRobotPose().getVector().getX(), driveSS.getRobotPose().getVector().getY(), Math.toDegrees(driveSS.getRobotPose().getTheta())));
 
+        tad("range", driveSS.getUsedTags().get(0).ftcPose.range);
+        tad("bearing", driveSS.getUsedTags().get(0).ftcPose.bearing);
 
 
         tad("roll", Math.toDegrees(robot.getRoll()));

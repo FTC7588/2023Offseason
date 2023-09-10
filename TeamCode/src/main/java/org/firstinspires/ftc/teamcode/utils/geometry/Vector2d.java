@@ -37,6 +37,11 @@ public class Vector2d {
         return magnitudeProduct * vectorsCos;
     }
 
+    /**
+     *
+     * @param angle angle in radians
+     * @return rotated vector
+     */
     public Vector2d rotateBy(double angle) {
         return new Vector2d(Math.cos(angle)*x - Math.sin(angle)*y, Math.sin(angle)*x + Math.cos(angle)*y);
     }
