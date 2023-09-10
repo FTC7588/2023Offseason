@@ -30,18 +30,18 @@ public class Constants {
 
 
     //elevator
-    public static PoofyPIDCoefficients ELE_COEFFS = new PoofyPIDCoefficients(0.005, 0.000, 0.0004, 0, 0, 0, 0);
+    public static PoofyPIDCoefficients ELE_COEFFS = new PoofyPIDCoefficients(0.005, 0.000, 0.0004, 0.01, 0, 0, 0.15);
 
-    public static double ELE_MAX_VEL = 200;
-    public static double ELE_MAX_ACCEL = 100;
+    public static double ELE_MAX_VEL = 2000;
+    public static double ELE_MAX_ACCEL = 1000;
 
 
     //arm
     //public static PoofyPIDCoefficients ARM_COEFFS = new PoofyPIDCoefficients(0.01, 0.0001, 0.0001, 0.001, 0, 0.075, 0.125);
     public static PoofyPIDCoefficients ARM_COEFFS = new PoofyPIDCoefficients(0.005, 0, 0, 0, 0, 0, 0.125);
 
-    public static double ARM_MAX_VEL = 100;
-    public static double ARM_MAX_ACCEL = 200;
+    public static double ARM_MAX_VEL = 1000;
+    public static double ARM_MAX_ACCEL = 2000;
 
     public static double ARM_ANGLE_BACK = -110;
     public static double ARM_ANGLE_IDLE = 42.5;

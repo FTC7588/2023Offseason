@@ -40,7 +40,9 @@ public class AprilTagLocalizer2d implements Localizer {
     @Override
     public void update() {
         consolidateLists();
-        robotPose = lowestDecisionMarginStrategy2d(tagsWithCamPoses);
+        if (!tagsWithCamPoses.isEmpty()) {
+            robotPose = lowestDecisionMarginStrategy2d(tagsWithCamPoses);
+        }
     }
 
 
@@ -76,12 +78,12 @@ public class AprilTagLocalizer2d implements Localizer {
 
     protected Pose2d lowestDecisionMarginStrategy2d(LinkedHashMap<AprilTagDetection, Pose3d> detections) {
 
-        double lowestMargin = 10000000;
+        double lowestMargin = -1;
         AprilTagDetection lowestMarginTag = null;
         Pose3d lowestMarginCamPose = null;
 
         for (Map.Entry<AprilTagDetection, Pose3d> entry : detections.entrySet()) {
-            if (entry.getKey().decisionMargin < lowestMargin) {
+            if (lowestMargin < entry.getKey().decisionMargin || lowestMargin == -1) {
                 lowestMargin = entry.getKey().decisionMargin;
                 lowestMarginTag = entry.getKey();
                 lowestMarginCamPose = entry.getValue();

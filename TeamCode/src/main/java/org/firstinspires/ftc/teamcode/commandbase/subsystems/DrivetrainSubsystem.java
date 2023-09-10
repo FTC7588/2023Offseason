@@ -50,15 +50,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
         //tagLocalizer = new AprilTagLocalizer2dSingle(robot, CAMERA_POSE.toPose2d(), C920_INTRINSICS, VISION_AVG);
 
-        tagLocalizer = new AprilTagLocalizer2d(new CameraConfig(
-                robot.camera,
-                CAMERA_POSE,
-                C920_INTRINSICS,
-                15,
-                255,
-                new Size(640, 480),
-                VisionPortal.StreamFormat.MJPEG
-        ));
+        tagLocalizer = new AprilTagLocalizer2d(
+                new CameraConfig(
+                    robot.camera,
+                    CAMERA_POSE,
+                    C920_INTRINSICS,
+                    15,
+                    255,
+                    new Size(640, 480),
+                    VisionPortal.StreamFormat.MJPEG
+                )
+        );
 
         robotPose = new Pose2d(0, 0, 0);
     }

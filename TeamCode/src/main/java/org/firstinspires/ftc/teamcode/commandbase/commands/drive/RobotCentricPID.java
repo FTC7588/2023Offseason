@@ -32,7 +32,7 @@ public class RobotCentricPID extends CommandBase {
                 strafeSpeed.getAsDouble(),
                 forwardSpeed.getAsDouble(),
                 turnSpeed.getAsDouble(),
-                true
+                false
         );
     }
 }
