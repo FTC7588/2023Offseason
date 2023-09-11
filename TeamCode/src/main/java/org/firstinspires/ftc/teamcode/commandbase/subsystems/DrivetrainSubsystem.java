@@ -86,6 +86,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return tagLocalizer.getUsedTags();
     }
 
+    public AprilTagLocalizer2d getTagLocalizer() {
+        return tagLocalizer;
+    }
+
 
 //    public Pose2d getTagPose() {
 //        return tagLocalizer.getTagPose();

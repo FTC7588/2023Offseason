@@ -82,6 +82,14 @@ public class AprilTagLocalizer2d implements Localizer {
         return cameraPose.transformBy(robotToCam.toTransform2d().inverse());
     }
 
+    protected Pose2d getRobotToTagPose2dAxes(Pose2d tagPose, Transform2d camToTag, Pose3d robotToCam) {
+
+
+        Pose2d cameraPose = tagPose.transformBy(camToTag.inverse()).transformBy(coordinateFix2d);
+
+        return cameraPose.transformBy(robotToCam.toTransform2d().inverse());
+    }
+
     protected Pose2d getRobotToTagPose2dRangeBearing(AprilTagDetection detection, Pose3d robotToCam) {
         usedTags.add(detection);
 
@@ -118,7 +126,26 @@ public class AprilTagLocalizer2d implements Localizer {
         }
 
         assert lowestMarginTag != null;
-        return getRobotToTagPose2dRangeBearing(lowestMarginTag, lowestMarginCamPose);
+
+        Pose2d tagPose = new Pose2d(
+                lowestMarginTag.metadata.fieldPosition.get(0),
+                lowestMarginTag.metadata.fieldPosition.get(1),
+                MathUtil.quaternionToEuler(lowestMarginTag.metadata.fieldOrientation).yaw
+        );
+
+        Transform2d camToTag = new Transform2d(
+                lowestMarginTag.ftcPose.x,
+                lowestMarginTag.ftcPose.y,
+                Math.toRadians(lowestMarginTag.ftcPose.yaw)
+        );
+
+        return getRobotToTagPose2dAxes(tagPose, camToTag, lowestMarginCamPose);
+    }
+
+    protected Pose2d averageTagsStrategy(LinkedHashMap<AprilTagDetection, Pose3d> detectionPose3dLinkedHashMap) {
+
+
+
     }
 
     public Pose2d getPoseEstimate() {
