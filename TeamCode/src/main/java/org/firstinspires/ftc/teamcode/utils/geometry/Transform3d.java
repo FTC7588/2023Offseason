@@ -53,6 +53,10 @@ public class Transform3d {
         return rotation3d;
     }
 
+    public Transform2d toTransform2d() {
+        return new Transform2d(getX(), getY(), rotation3d.getZ());
+    }
+
     public String toString() {
         return String.format("Transform3d:\n%s\n%s", vector3d, rotation3d);
     }

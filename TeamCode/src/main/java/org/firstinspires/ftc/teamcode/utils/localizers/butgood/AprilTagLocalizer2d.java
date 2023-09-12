@@ -24,7 +24,7 @@ public class AprilTagLocalizer2d implements Localizer {
 
     protected ArrayList<AprilTagDetection> usedTags = new ArrayList<>();
 
-    protected Pose2d robotPose;
+    protected Pose2d robotPose = new Pose2d(0, 0, 0);
 
     protected Transform2d coordinateFix2d = new Transform2d(0, 0, Math.toRadians(90));
     protected Transform3d coordinateFix3d = new Transform3d(
@@ -144,7 +144,7 @@ public class AprilTagLocalizer2d implements Localizer {
 
     protected Pose2d averageTagsStrategy(LinkedHashMap<AprilTagDetection, Pose3d> detectionPose3dLinkedHashMap) {
 
-
+        return new Pose2d(1, 1, 1);
 
     }
 

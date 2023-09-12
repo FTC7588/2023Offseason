@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.commandbase.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.hardware.PwmControl;
 
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
@@ -25,15 +26,19 @@ public class RotatorSubsystem extends SubsystemBase {
     }
 
     public void write() {
-        if (targetPosition != actualPosition) {
+//        if (targetPosition != actualPosition) {
             robot.rotator.setPosition(targetPosition);
-        }
+//        }
     }
 
 
     //setter
     public void setTargetPosition(double target) {
         targetPosition = target;
+    }
+
+    public void setPWMRange(PwmControl.PwmRange range) {
+        robot.rotator.setPwmRange(range);
     }
 
 
