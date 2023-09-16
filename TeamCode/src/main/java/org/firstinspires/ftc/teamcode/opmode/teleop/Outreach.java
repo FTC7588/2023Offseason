@@ -13,6 +13,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.hardware.Constants.ARM_ANGLE_BACK;
 import static org.firstinspires.ftc.teamcode.hardware.Constants.ARM_ANGLE_FRONT;
 import static org.firstinspires.ftc.teamcode.hardware.Constants.ARM_ANGLE_IDLE;
+import static org.firstinspires.ftc.teamcode.hardware.Constants.TUNED_RANGE;
 
 import android.annotation.SuppressLint;
 
@@ -31,6 +32,7 @@ import org.firstinspires.ftc.teamcode.commandbase.commands.drive.RobotCentricPID
 import org.firstinspires.ftc.teamcode.commandbase.commands.elevator.MoveElevatorToPosition;
 import org.firstinspires.ftc.teamcode.commandbase.commands.intake.SetIntakePower;
 import org.firstinspires.ftc.teamcode.commandbase.commands.rotator.SetRotatorPosition;
+import org.firstinspires.ftc.teamcode.commandbase.commands.rotator.SetRotatorRange;
 import org.firstinspires.ftc.teamcode.opmode.BaseOpMode;
 import org.firstinspires.ftc.teamcode.utils.AprilTagCustomDatabase;
 import org.firstinspires.ftc.teamcode.utils.PoofyDashboardUtil;
@@ -57,6 +59,8 @@ public class Outreach extends BaseOpMode {
 
     private SetRotatorPosition rotForward;
     private SetRotatorPosition rotBack;
+
+    private SetRotatorRange rotRange;
 
     private SetIntakePower intakeIn;
     private SetIntakePower intakeIdle;
@@ -136,6 +140,8 @@ public class Outreach extends BaseOpMode {
         rotForward = new SetRotatorPosition(rotSS, 1);
         rotBack = new SetRotatorPosition(rotSS, 0);
 
+        rotRange = new SetRotatorRange(rotSS, TUNED_RANGE);
+
         //intake commands
         intakeIn = new SetIntakePower(intakeSS, 1);
         intakeIdle = new SetIntakePower(intakeSS, 0);
@@ -159,9 +165,9 @@ public class Outreach extends BaseOpMode {
 //        gp1(X, 1).whenActive(armBack);
 //        gp1(A, 1).whenActive(armIdle);
 //        gp1(B, 1).whenActive(armForward);
-//
-//        //rotator control
-//        gp1(Y, 1).toggleWhenActive(rotBack, rotForward);
+
+        //rotator control
+        gp1(Y, 1).toggleWhenActive(rotBack, rotForward);
 
         //intake controls
         gp1(LEFT_BUMPER, 1).whenActive(intakeOut).whenInactive(intakeIdle);
@@ -172,6 +178,7 @@ public class Outreach extends BaseOpMode {
 
 
         //init commands
+        rotRange.schedule();
         robotCentricPID.schedule();
         rotForward.schedule();
 

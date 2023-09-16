@@ -135,7 +135,7 @@ public class RobotHardware {
 
         rotator.setDirection(Servo.Direction.REVERSE);
 
-        rotator.setPwmRange(TUNED_RANGE);
+        //rotator.setPwmRange(TUNED_RANGE);
 
 
         //intake
