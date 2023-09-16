@@ -37,7 +37,7 @@ public class PoofyTagDetection {
                 Math.toRadians(tag.ftcPose.yaw)
         );
 
-        cameraPose2d
+        cameraPose2d = null;
     }
 
     public Pose2d getTagPose2d() {

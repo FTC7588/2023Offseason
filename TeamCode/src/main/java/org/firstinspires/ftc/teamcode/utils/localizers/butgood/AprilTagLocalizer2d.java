@@ -144,7 +144,7 @@ public class AprilTagLocalizer2d implements Localizer {
 
     protected Pose2d averageTagsStrategy(LinkedHashMap<AprilTagDetection, Pose3d> detectionPose3dLinkedHashMap) {
 
-
+        return new Pose2d(1, 1, 1);
 
     }
 

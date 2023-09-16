@@ -67,7 +67,7 @@ public class MecanumDrive {
         forwardMax = backMax = leftMax = rightMax = 1;
     }
 
-    
+
 
     public void setMaxSpeed(double maxOutput) {
         this.maxOutput = maxOutput;
