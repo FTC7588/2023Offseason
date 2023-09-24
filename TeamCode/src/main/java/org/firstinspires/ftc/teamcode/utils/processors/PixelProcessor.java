@@ -129,40 +129,29 @@ public class PixelProcessor implements VisionProcessor {
         Imgproc.findContours(threshes.get(2), contours.get(2), hierarchies, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         for (MatOfPoint contour : contours.get(2)) {
-            Imgproc.drawContours(purpleThresh, contours.get(2), 0, whiteColor, 2);
-
             double width = calculateWidth(contour);
             double height = calculateHeight(contour);
 
             width -= 2;
             height -= 2;
 
-            Moments moments = Imgproc.moments(contour);
-            double cX = moments.get_m10() / moments.get_m00();
-            double cY = moments.get_m01() / moments.get_m00();
+//            Moments moments = Imgproc.moments(contour);
+//            double cX = moments.get_m10() / moments.get_m00();
+//            double cY = moments.get_m01() / moments.get_m00();
 
-            Imgproc.rectangle(
-                    input,
-                    new Point(cX - (width/2), cY - (height/2)),
-                    new Point(cX + (width/2), cY + (height/2)),
-                    purpleColor,
-                    1
-            );
+//            Imgproc.rectangle(
+//                    input,
+//                    new Point(cX - (width/2), cY - (height/2)),
+//                    new Point(cX + (width/2), cY + (height/2)),
+//                    purpleColor,
+//                    1
+//            );
         }
 
-//        for (Mat thresh : threshes) {
-//            thresh.release();
-//        }
-//
-//        for (ArrayList<MatOfPoint> matPoint : contours) {
-//            for (MatOfPoint mat : matPoint) {
-//                mat.release();
-//            }
-//        }
-//
-//        hierarchies.release();
 
-        threshes.clear();
+        hsv.release();
+        hierarchies.release();
+
         return input;
     }
 
